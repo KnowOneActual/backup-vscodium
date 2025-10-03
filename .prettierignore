@@ -1,0 +1,7 @@
+# Ignore markdown files formatting them manually
+*.md
+
+# Standard ignores
+/node_modules
+/dist
+/build
