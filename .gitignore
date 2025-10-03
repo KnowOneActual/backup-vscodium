@@ -1,0 +1,154 @@
+# General-purpose ignores for different operating systems and editors.
+# ===================================================================
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+._*
+.AppleDouble
+.LSOverride
+$RECYCLE.BIN/
+
+# Log and temporary files
+*.log
+log.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.err
+*.diff
+*.rej
+*.orig
+*.swo
+*.swp
+*~
+.tmp/
+*.tmp
+
+# Editor & IDE specific folders and files
+.idea/
+.vscode/
+.project
+.settings
+.tmproj
+*.esproj
+nbproject/
+*.komodoproject
+.komodotools/
+*.sublime-project
+*.sublime-workspace
+sftp-config.json
+
+# Sublime Text cache files
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+Package Control.last-run
+Package Control.ca-list
+Package Control.ca-bundle
+Package Control.system-ca-bundle
+Package Control.cache/
+Package Control.ca-certs/
+Package Control.merged-ca-bundle
+Package Control.user-ca-bundle
+oscrypto-ca-bundle.crt
+bh_unicode_properties.cache
+GitHub.sublime-settings
+
+# Build, dependency, and environment files
+# =========================================
+
+# Dependency directories
+/node_modules/
+/bower_components/
+/.pnp
+.pnp.js
+
+# Build and distribution output
+/build/
+/dist/
+/coverage/
+/publish/
+/intermediate/
+
+# Environment variables (keep your secrets out of the repo)
+.env
+.env.local
+.env.*.local
+
+# Python
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Python build and distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Testing
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# PyCharm
+.idea/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Machine learning / AI models
+*.h5
+*.hdf5
+*.pb
+*.ckpt
+*.pth
+*.pt
+*.model
+models/
+checkpoints/
+weights/
+
+# Project-specific ignores
+# ========================
+# Add any files or folders specific to the project you're currently in.
+# For example:
+# /my-secret-folder/
+
+# My Personal shorthands (original file)
+# ==============================================
+_hold
+_docs
+_comps*
+_scratch.*
+*.scratch.*
+*.scratch
+start-work.sh
+WARP.md
+
