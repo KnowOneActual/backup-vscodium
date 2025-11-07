@@ -33,7 +33,7 @@ This tool finds your VSCodium configuration and copies:
 
 1.  **Clone or Download**
     ```sh
-    git clone [https://github.com/knowoneactual/backup-vscodium.git](https://github.com/knowoneactual/backup-vscodium.git)
+    git clone https://github.com/knowoneactual/backup-vscodium.git
     cd backup-vscodium
     ```
 
