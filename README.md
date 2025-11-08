@@ -6,7 +6,7 @@
 
 A simple set of shell scripts to back up and restore VSCodium settings on **macOS** and **Linux**.
 
-VSCodium is a fantastic, fully open-source build of VS Code. Its one missing piece is the built-in Settings Sync, which requires a Microsoft account. This project provides a simple, local-first alternative.
+VSCodium is an open-source build of VS Code. Its one missing piece is the built-in Settings Sync, which requires a Microsoft account. This project provides a simple, local-first alternative.
 
 ---
 
