@@ -17,7 +17,7 @@ VSCodium is an open-source build of VS Code. Its one missing piece is the built-
 
 🚨 Heads Up: Still in Early Days!
 
-This project is brand new, and the scripts haven't been exhaustively tested yet. Please be aware that there might be unexpected issues, and we recommend you use it at your own risk. Backup your backups :) If you find any issues, please let us know—we're actively working on it!
+This project is brand new, and the scripts haven't been exhaustively tested yet. Please be aware that there might be unexpected issues, and I recommend you use it at your own risk. Backup your backups :) If you find any issues, please let me know.
 
 ---
 
@@ -63,7 +63,7 @@ This tool finds your VSCodium configuration and copies:
 
 ## 🧠 Curious How It Works?
 
-We wanted the same scripts to work everywhere. The key is that they automatically detect your operating system by checking uname. That way, the script knows exactly where to find the VSCodium configuration directory on either macOS or Linux, and you don't have to worry about the path!
+I wanted the same scripts to work everywhere. The key is that they automatically detect your operating system by checking uname. That way, the script knows exactly where to find the VSCodium configuration directory on either macOS or Linux, and you don't have to worry about the path!
 
 * **macOS Path:** `~/Library/Application Support/VSCodium`
 * **Linux Path:** `~/.config/VSCodium`
