@@ -1,3 +1,8 @@
+<p align="center">
+<img src="assets/img/backup-vscodium_logo.webp" alt="alt text" width="150">
+</p>
+
+
 # backup-vscodium
 
 [![Project Status: Development](https://img.shields.io/badge/Project%20Status-Development-blueviolet)](https://github.com/knowoneactual/backup-vscodium)
@@ -10,13 +15,13 @@ VSCodium is an open-source build of VS Code. Its one missing piece is the built-
 
 ---
 
-## ⚠️ Early Development
+🚨 Heads Up: Still in Early Days!
 
-**Warning:** This project is in its early stages. The scripts have not been thoroughly tested and could have unexpected issues. Please **use at your own risk** and always back up your backups!
+This project is brand new, and the scripts haven't been exhaustively tested yet. Please be aware that there might be unexpected issues, and we recommend you use it at your own risk. Backup your backups :) If you find any issues, please let us know—we're actively working on it!
 
 ---
 
-## What it Backs Up
+## 💾 What it Backs Up
 
 This tool finds your VSCodium configuration and copies:
 * `settings.json` (Your settings)
@@ -24,12 +29,12 @@ This tool finds your VSCodium configuration and copies:
 * `snippets/` (All your user snippets)
 * A list of your installed extensions (saved to `extensions.txt`)
 
-## Requirements
+## ⚙️ Requirements
 
 1.  VSCodium must be installed.
 2.  The `codium` command must be available in your system's `PATH`. This is how the script lists your extensions.
 
-## How to Use
+## 🚀 How to Use
 
 1.  **Clone or Download**
     ```sh
@@ -56,14 +61,13 @@ This tool finds your VSCodium configuration and copies:
     ```
     This will copy all your settings back and reinstall your extensions. You'll need to restart VSCodium.
 
-## How It Works
+## 🧠 Curious How It Works?
 
-These scripts automatically detect your operating system (`uname`) to find the correct VSCodium configuration directory.
+We wanted the same scripts to work everywhere. The key is that they automatically detect your operating system by checking uname. That way, the script knows exactly where to find the VSCodium configuration directory on either macOS or Linux, and you don't have to worry about the path!
 
 * **macOS Path:** `~/Library/Application Support/VSCodium`
 * **Linux Path:** `~/.config/VSCodium`
 
-This allows the same scripts to work on both platforms without any changes.
 
 ## 🤝 Contributing
 
