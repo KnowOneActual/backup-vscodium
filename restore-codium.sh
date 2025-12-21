@@ -11,9 +11,7 @@ set -euo pipefail
 # ============================================================================
 
 readonly SCRIPT_VERSION="2.0.0"
-SCRIPT_NAME
-SCRIPT_NAME=$(basename "$0")
-readonly SCRIPT_NAME
+readonly SCRIPT_NAME=$(basename "$0")
 
 # Default backup location
 DEFAULT_BACKUP_DIR="$HOME/Documents/VSCodium_Backup"
