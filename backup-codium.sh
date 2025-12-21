@@ -12,7 +12,7 @@ set -euo pipefail
 
 readonly SCRIPT_VERSION="2.0.0"
 SCRIPT_NAME
-SCRIPT_NAME="$(basename "$0")"
+SCRIPT_NAME=$(basename "$0")
 readonly SCRIPT_NAME
 
 # Default backup location
@@ -93,7 +93,7 @@ EOF
 log() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
@@ -107,7 +107,7 @@ log() {
 log_error() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
@@ -119,7 +119,7 @@ log_error() {
 log_success() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] SUCCESS: $message" >> "$LOG_FILE"
@@ -133,7 +133,7 @@ log_success() {
 log_warning() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
@@ -181,7 +181,7 @@ check_codium_command() {
 validate_backup_location() {
     # Check if backup location is writable
     local parent_dir
-    parent_dir="$(dirname "$BACKUP_DIR")"
+    parent_dir=$(dirname "$BACKUP_DIR")
     
     if [ ! -d "$parent_dir" ]; then
         log_error "Parent directory does not exist: $parent_dir"
@@ -292,7 +292,7 @@ backup_file() {
     local source_file="$1"
     local dest_dir="$2"
     local file_name
-    file_name="$(basename "$source_file")"
+    file_name=$(basename "$source_file")
     
     if [ ! -f "$source_file" ]; then
         log_warning "File not found, skipping: $source_file"
@@ -318,7 +318,7 @@ backup_directory() {
     local source_dir="$1"
     local dest_dir="$2"
     local dir_name
-    dir_name="$(basename "$source_dir")"
+    dir_name=$(basename "$source_dir")
     
     if [ ! -d "$source_dir" ]; then
         log_warning "Directory not found, skipping: $source_dir"
@@ -327,7 +327,7 @@ backup_directory() {
     
     if [ "$DRY_RUN" = true ]; then
         local file_count
-        file_count="$(find "$source_dir" -type f | wc -l)"
+        file_count=$(find "$source_dir" -type f | wc -l)
         log "[DRY-RUN] Would backup $dir_name ($file_count files) -> $dest_dir/"
         return 0
     fi
@@ -359,7 +359,7 @@ backup_extensions() {
     
     if codium --list-extensions > "$extensions_file" 2>/dev/null; then
         local ext_count
-        ext_count="$(wc -l < "$extensions_file")"
+        ext_count=$(wc -l < "$extensions_file")
         log_success "Backed up extension list ($ext_count extensions)"
         return 0
     else
