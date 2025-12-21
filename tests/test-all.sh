@@ -41,46 +41,15 @@ test_case() {
 
 pass() {
     ((PASS_COUNT++))
-    echo "  ✓ PASS: $1" | tee -a "$TEST_LOG"
+    local msg="  ✓ PASS: $1"
+    echo "$msg" | tee -a "$TEST_LOG"
 }
 
 fail() {
     ((FAIL_COUNT++))
-    echo "  ✗ FAIL: $1" | tee -a "$TEST_LOG"
-}
-
-assert_exit_code() {
-    local expected=$1
-    local actual=$2
-    local message=$3
-    
-    if [ "$actual" -eq "$expected" ]; then
-        pass "$message (exit code: $actual)"
-    else
-        fail "$message (expected: $expected, got: $actual)"
-    fi
-}
-
-assert_file_exists() {
-    local file=$1
-    local message=$2
-    
-    if [ -f "$file" ]; then
-        pass "$message (file exists)"
-    else
-        fail "$message (file not found: $file)"
-    fi
-}
-
-assert_dir_exists() {
-    local dir=$1
-    local message=$2
-    
-    if [ -d "$dir" ]; then
-        pass "$message (directory exists)"
-    else
-        fail "$message (directory not found: $dir)"
-    fi
+    local msg="  ✗ FAIL: $1"
+    echo "$msg" | tee -a "$TEST_LOG"
+    # Don't return error - let test framework handle it
 }
 
 # ============================================================================
@@ -182,7 +151,7 @@ test_help_flags() {
     fi
     
     test_case "Backup --version flag works"
-    local output
+    local output=""
     if output=$(bash "$BACKUP_SCRIPT" --version 2>&1); then
         if [[ $output == *"v"* ]]; then
             pass "backup-codium.sh --version returns version"
@@ -249,7 +218,7 @@ test_dry_run_mode() {
     print_header "Dry-Run Mode Tests"
     
     test_case "Backup --dry-run mode doesn't create backup"
-    local test_backup_dir
+    local test_backup_dir=""
     test_backup_dir="/tmp/backup_dryrun_test_$$"
     if bash "$BACKUP_SCRIPT" --dry-run --location "$test_backup_dir" &>/dev/null; then
         if [ ! -d "$test_backup_dir" ]; then
@@ -263,7 +232,7 @@ test_dry_run_mode() {
     fi
     
     test_case "Backup --dry-run produces output"
-    local output
+    local output=""
     if output=$(bash "$BACKUP_SCRIPT" --dry-run 2>&1); then
         if [[ $output == *"DRY RUN"* ]] || [[ $output == *"would"* ]]; then
             pass "backup-codium.sh --dry-run produces expected output"
@@ -319,7 +288,7 @@ test_verbose_logging() {
     print_header "Verbose & Logging Tests"
     
     test_case "Backup --verbose flag works"
-    local output
+    local output=""
     if output=$(bash "$BACKUP_SCRIPT" --dry-run --verbose 2>&1); then
         if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
             pass "backup-codium.sh --verbose produces logging output"
