@@ -40,25 +40,28 @@ echo ""
 
 print_header() {
     echo ""
-    echo "═══════════════════════════════════════════════════════════════"
+    echo "═══════════════════════════════════════════════════════════════════════════════════"
     echo "  $1"
-    echo "═══════════════════════════════════════════════════════════════"
+    echo "═══════════════════════════════════════════════════════════════════════════════════"
 }
 
 test_case() {
-    ((TEST_COUNT++))
+    # Increment counter safely
+    TEST_COUNT=$((TEST_COUNT + 1)) || true
     echo ""
     echo "[TEST $TEST_COUNT] $1"
 }
 
 pass() {
-    ((PASS_COUNT++))
+    # Increment counter safely
+    PASS_COUNT=$((PASS_COUNT + 1)) || true
     local msg="  ✓ PASS: $1"
     echo "$msg" | tee -a "$TEST_LOG"
 }
 
 fail() {
-    ((FAIL_COUNT++))
+    # Increment counter safely
+    FAIL_COUNT=$((FAIL_COUNT + 1)) || true
     local msg="  ✗ FAIL: $1"
     echo "$msg" | tee -a "$TEST_LOG"
 }
@@ -383,10 +386,12 @@ run_all_tests() {
     
     echo "[DEBUG] Calling print_test_summary"
     print_test_summary
-    echo "[DEBUG] print_test_summary completed"
+    echo "[DEBUG] print_test_summary completed with exit code $?"
 }
 
 print_test_summary() {
+    local exit_code=0
+    
     echo ""
     print_header "Test Summary"
     echo "Total Tests: $TEST_COUNT"
@@ -397,12 +402,14 @@ print_test_summary() {
     if [ "$FAIL_COUNT" -eq 0 ]; then
         echo "🎉 All tests passed!"
         echo ""
-        return 0
+        exit_code=0
     else
         echo "⚠️  Some tests failed. See details above."
         echo ""
-        return 1
+        exit_code=1
     fi
+    
+    return "$exit_code"
 }
 
 # ============================================================================
@@ -417,5 +424,6 @@ fi
 
 echo "[DEBUG] Calling run_all_tests"
 run_all_tests
-echo "[DEBUG] run_all_tests completed with exit code $?"
-exit $?
+TEST_EXIT_CODE=$?
+echo "[DEBUG] run_all_tests completed with exit code $TEST_EXIT_CODE"
+exit "$TEST_EXIT_CODE"
