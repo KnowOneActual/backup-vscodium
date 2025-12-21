@@ -15,7 +15,7 @@ VSCodium is an open-source build of VS Code. Its one missing piece is the built-
 
 ---
 
-🚨 Heads Up: Please be aware that there still might be unexpected issues, and I recommend you use it at your own risk. Backup your backups :) If you find any issues, please let me know.
+🚨 Heads Up: I still have limited testing on different platforms. Please remember that there could still be issues, so I suggest you use it at your own risk. Don't forget to back up your backup! :)
 
 ---
 
