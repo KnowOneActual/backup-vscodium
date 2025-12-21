@@ -10,8 +10,10 @@ set -euo pipefail
 # CONFIGURATION & DEFAULTS
 # ============================================================================
 
-readonly SCRIPT_VERSION="2.0.0"
-readonly SCRIPT_NAME=$(basename "$0")
+SCRIPT_VERSION="2.0.0"
+readonly SCRIPT_VERSION
+SCRIPT_NAME=$(basename "$0")
+readonly SCRIPT_NAME
 
 # Default backup location
 DEFAULT_BACKUP_DIR="$HOME/Documents/VSCodium_Backup"
@@ -343,7 +345,7 @@ backup_directory() {
 backup_extensions() {
     local extensions_file="$BACKUP_DIR/extensions.txt"
     
-    if [ ! -f "$(command -v codium)" ]; then
+    if ! command -v codium &> /dev/null; then
         log_warning "codium command not available, skipping extensions"
         return 1
     fi
@@ -422,13 +424,25 @@ create_manifest() {
 
 print_summary() {
     local settings_status
-    settings_status="[$([ "$BACKUP_SETTINGS" = true ] && echo "✓" || echo "✗")]"
+    settings_status="[✓]"
+    if [ "$BACKUP_SETTINGS" != true ]; then
+        settings_status="[✗]"
+    fi
     local keybindings_status
-    keybindings_status="[$([ "$BACKUP_KEYBINDINGS" = true ] && echo "✓" || echo "✗")]"
+    keybindings_status="[✓]"
+    if [ "$BACKUP_KEYBINDINGS" != true ]; then
+        keybindings_status="[✗]"
+    fi
     local snippets_status
-    snippets_status="[$([ "$BACKUP_SNIPPETS" = true ] && echo "✓" || echo "✗")]"
+    snippets_status="[✓]"
+    if [ "$BACKUP_SNIPPETS" != true ]; then
+        snippets_status="[✗]"
+    fi
     local extensions_status
-    extensions_status="[$([ "$BACKUP_EXTENSIONS" = true ] && echo "✓" || echo "✗")]"
+    extensions_status="[✓]"
+    if [ "$BACKUP_EXTENSIONS" != true ]; then
+        extensions_status="[✗]"
+    fi
     
     echo ""
     echo "========================================"
