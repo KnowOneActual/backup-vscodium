@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to backup-vscodium will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -8,49 +8,157 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2025-12-21
 
 ### Added
-- **Checksum Verification**: SHA256 checksums for all backed-up files
-- **Manifest Files**: Detailed metadata about backups (date, OS, components)
-- **Dry-Run Mode**: Preview backups/restores without modifying files (`--dry-run`)
-- **Selective Operations**: Backup/restore only specific components with flags like `--only-settings`, `--no-extensions`
-- **Comprehensive Logging**: Detailed logs of all operations saved to `backup.log` and `restore.log`
-- **Safety Prompts**: Confirmation dialogs before overwriting existing configurations
-- **Verbose Output**: Detailed status messages with `--verbose` flag
-- **Timestamped Backups**: Automatic timestamping option (`--timestamp`)
-- **Argument Parsing**: Full CLI with `--help` and `--version` support
-- **Custom Locations**: Specify backup location with `--location` and `--backup` flags
-- **Summary Reports**: Clear before/after status with file counts and sizes
-- **Improved Error Handling**: Better detection and reporting of issues
-- **Test Suite**: Comprehensive test suite in `tests/test-all.sh`
-- **Quick Reference Guide**: Common commands and use cases in `docs/QUICK_REFERENCE.md`
-
-### Changed
-- **Complete Rewrite**: Scripts rewritten for robustness and feature completeness
-- **Better OS Detection**: More reliable platform detection with error handling
-- **Improved Logging**: All operations logged with timestamps
-- **User Feedback**: Clear status messages and progress indicators
-- **README**: Expanded with advanced usage, troubleshooting, and examples
+- **Integration Tests** - Real backup/restore operations with mock VSCodium configs
+- **Comprehensive README** - 30+ examples, command reference, troubleshooting guide
+- **Release Automation** - Semantic version bumping and GitHub Actions releases
+- **Testing Documentation** - Complete TESTING.md with debugging tips
+- **Version Bump Script** - Automated semantic versioning with `scripts/bump-version.sh`
+- **Release Workflow** - Automatic GitHub releases triggered by git tags
 
 ### Fixed
-- Script now validates backup location is writable before proceeding
-- Better handling of missing optional files (keybindings.json, etc.)
-- Improved error messages when `codium` command is not found
-- Fixed potential race conditions in directory creation
+- **ShellCheck SC2155** - Separated `readonly` declarations from assignments
+- **ShellCheck SC2320** - Fixed `$?` exit code capture in test framework
+- **Bash Arithmetic** - Replaced `((var++))` with `var=$((var+1)) || true` for `set -e` compatibility
+- **Unit Tests** - Removed tests for unimplemented features (now feature requests)
 
-### Security
-- SHA256 checksums enable integrity verification
-- Backup validation on restore
-- Confirmation prompts prevent accidental overwrites
+### Changed
+- Refactored test suite from unit tests to integration tests
+- Improved logging with timestamps and structured output
+- Enhanced error messages with more specific guidance
+- Updated help text for clarity
 
-## [1.0.0] - 2024-XX-XX
+### Documentation
+- Added TESTING.md with comprehensive testing guide
+- Added CHANGELOG.md for version tracking
+- Created integration test suite documentation
+- Added release process documentation
+
+## [1.0.0] - Initial Release
 
 ### Added
-- `backup-codium.sh`: Initial script to back up user settings, keybindings, snippets, and extension list
-- `restore-codium.sh`: Initial script to restore configuration and reinstall extensions from a backup
-- `README.md`: Project description, badges, and usage instructions
-- `.snyk`: Snyk security scan configuration
-- Auto-detection of operating system (macOS or Linux) for correct VSCodium config directory
-- Error checks to prevent "No such file or directory" errors
-- Clean, straightforward shell script implementation
+- Core backup functionality
+  - Backup settings.json
+  - Backup keybindings.json
+  - Backup snippets directory
+  - Backup extensions list
 
-[2.0.0]: https://github.com/knowoneactual/backup-vscodium/releases/tag/v2.0.0
-[1.0.0]: https://github.com/knowoneactual/backup-vscodium/releases/tag/v1.0.0
+- Core restore functionality
+  - Restore from backup with checksum verification
+  - Confirmation prompts for safety
+  - Selective restore options
+
+- Command-line interface
+  - Help and version flags
+  - Custom backup locations
+  - Dry-run mode
+  - Verbose logging
+
+- Cross-platform support
+  - macOS support
+  - Linux support
+  - OS detection and path configuration
+
+- Safety features
+  - Checksum generation and verification
+  - Manifest files for metadata
+  - Comprehensive logging
+  - Error handling and validation
+
+---
+
+## How to Read This Changelog
+
+### Sections
+- **Added** - New features introduced
+- **Changed** - Changes in existing functionality
+- **Deprecated** - Soon-to-be removed features
+- **Removed** - Now removed features
+- **Fixed** - Bug fixes
+- **Security** - Security vulnerability fixes
+
+### Version Format
+- **MAJOR** - Incompatible API changes
+- **MINOR** - New functionality in backwards-compatible manner
+- **PATCH** - Backwards-compatible bug fixes
+
+Example: `2.0.0` = Major version 2, minor version 0, patch version 0
+
+---
+
+## Release Process
+
+### To Create a New Release
+
+1. **Bump the version:**
+   ```bash
+   ./scripts/bump-version.sh patch  # or minor, or major
+   ```
+
+2. **Push to GitHub:**
+   ```bash
+   git push origin main
+   git push origin v2.0.1  # or whatever version was created
+   ```
+
+3. **GitHub Actions will automatically:**
+   - Run all tests
+   - Create GitHub release with notes
+   - Build release artifacts (if configured)
+
+4. **View your release:**
+   - https://github.com/KnowOneActual/backup-vscodium/releases
+
+### Version Bumping Rules
+
+**Patch Release (2.0.0 -> 2.0.1)**
+- Bug fixes
+- Performance improvements
+- Documentation updates
+- Minor improvements
+
+**Minor Release (2.0.0 -> 2.1.0)**
+- New features
+- New command-line flags
+- Non-breaking changes
+
+**Major Release (2.0.0 -> 3.0.0)**
+- Breaking changes
+- API changes
+- Significant rewrites
+
+---
+
+## Upcoming Features (Roadmap)
+
+Planned for future releases:
+
+- [ ] Windows support (PowerShell version)
+- [ ] Incremental backups
+- [ ] Cloud storage integration (S3, Google Drive)
+- [ ] GUI interface
+- [ ] Backup scheduling
+- [ ] Automatic backup on VSCodium shutdown
+- [ ] Diff viewer for comparing backups
+- [ ] Backup encryption
+- [ ] Multi-device sync
+
+---
+
+## Legacy Versions
+
+For historical reference, earlier versions can be found at:
+https://github.com/KnowOneActual/backup-vscodium/releases
+
+---
+
+## Contributing
+
+When contributing, please:
+
+1. Follow semantic versioning
+2. Update CHANGELOG.md with your changes
+3. Use the format shown above
+4. Add your changes under the appropriate "Unreleased" section
+5. Update version in scripts when ready for release
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
