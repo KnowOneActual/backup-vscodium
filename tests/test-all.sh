@@ -11,24 +11,17 @@ set -euo pipefail
 # ============================================================================
 
 SCRIPT_DIR
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 readonly SCRIPT_DIR
 
 PROJECT_DIR
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 readonly PROJECT_DIR
 
-BACKUP_SCRIPT="$PROJECT_DIR/backup-codium.sh"
-readonly BACKUP_SCRIPT
-
-RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
-readonly RESTORE_SCRIPT
-
-TEST_BACKUP_DIR="/tmp/vscodium_test_backup"
-readonly TEST_BACKUP_DIR
-
-TEST_LOG="/tmp/vscodium_tests.log"
-readonly TEST_LOG
+readonly BACKUP_SCRIPT="$PROJECT_DIR/backup-codium.sh"
+readonly RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
+readonly TEST_BACKUP_DIR="/tmp/vscodium_test_backup"
+readonly TEST_LOG="/tmp/vscodium_tests.log"
 
 TEST_COUNT=0
 PASS_COUNT=0
@@ -192,6 +185,7 @@ test_help_flags() {
     fi
     
     test_case "Backup --version flag works"
+    local output
     if output=$(bash "$BACKUP_SCRIPT" --version 2>&1); then
         if [[ $output == *"v"* ]]; then
             pass "backup-codium.sh --version returns version"
@@ -258,6 +252,7 @@ test_dry_run_mode() {
     print_header "Dry-Run Mode Tests"
     
     test_case "Backup --dry-run mode doesn't create backup"
+    local test_backup_dir
     test_backup_dir="/tmp/backup_dryrun_test_$$"
     if bash "$BACKUP_SCRIPT" --dry-run --location "$test_backup_dir" &>/dev/null; then
         if [ ! -d "$test_backup_dir" ]; then
@@ -271,6 +266,7 @@ test_dry_run_mode() {
     fi
     
     test_case "Backup --dry-run produces output"
+    local output
     if output=$(bash "$BACKUP_SCRIPT" --dry-run 2>&1); then
         if [[ $output == *"DRY RUN"* ]] || [[ $output == *"would"* ]]; then
             pass "backup-codium.sh --dry-run produces expected output"
@@ -326,6 +322,7 @@ test_verbose_logging() {
     print_header "Verbose & Logging Tests"
     
     test_case "Backup --verbose flag works"
+    local output
     if output=$(bash "$BACKUP_SCRIPT" --dry-run --verbose 2>&1); then
         if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
             pass "backup-codium.sh --verbose produces logging output"
@@ -354,7 +351,7 @@ test_verbose_logging() {
 
 run_all_tests() {
     echo ""
-    echo "🧪 backup-vscodium Test Suite"
+    echo "🦧 backup-vscodium Test Suite"
     echo "==============================="
     
     setup_test_env
