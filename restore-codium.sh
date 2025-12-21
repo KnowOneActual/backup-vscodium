@@ -10,7 +10,7 @@ set -euo pipefail
 # CONFIGURATION & DEFAULTS
 # ============================================================================
 
-SCRIPT_VERSION="2.0.0"
+SCRIPT_VERSION="2.0.1"
 readonly SCRIPT_VERSION
 SCRIPT_NAME=$(basename "$0")
 readonly SCRIPT_NAME
