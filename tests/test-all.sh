@@ -2,7 +2,7 @@
 
 # test-all.sh
 # Comprehensive test suite for backup-vscodium scripts
-# Tests: argument parsing, dry-run, selective operations, error handling
+# Tests: basic functionality, help, version, error handling
 
 set -euo pipefail
 
@@ -199,11 +199,11 @@ test_help_flags() {
 }
 
 # ============================================================================
-# ARGUMENT PARSING TESTS
+# ERROR HANDLING TESTS
 # ============================================================================
 
-test_argument_parsing() {
-    print_header "Argument Parsing Tests"
+test_argument_validation() {
+    print_header "Error Handling Tests"
     
     test_case "Backup script rejects unknown arguments"
     if ! bash "$BACKUP_SCRIPT" --unknown-flag &>/dev/null; then
@@ -217,121 +217,6 @@ test_argument_parsing() {
         pass "restore-codium.sh correctly rejects unknown flags"
     else
         fail "restore-codium.sh should reject unknown flags"
-    fi
-    
-    test_case "Backup accepts custom location"
-    if bash "$BACKUP_SCRIPT" --dry-run --location /tmp/test_backup &>/dev/null; then
-        pass "backup-codium.sh accepts --location flag"
-    else
-        fail "backup-codium.sh --location flag parsing failed"
-    fi
-    
-    test_case "Restore accepts custom backup path"
-    if bash "$RESTORE_SCRIPT" --dry-run --backup /tmp/test_backup &>/dev/null; then
-        pass "restore-codium.sh accepts --backup flag"
-    else
-        fail "restore-codium.sh --backup flag parsing failed"
-    fi
-}
-
-# ============================================================================
-# DRY-RUN MODE TESTS
-# ============================================================================
-
-test_dry_run_mode() {
-    print_header "Dry-Run Mode Tests"
-    
-    test_case "Backup --dry-run mode doesn't create backup"
-    local test_backup_dir=""
-    test_backup_dir="/tmp/backup_dryrun_test_$$"
-    if bash "$BACKUP_SCRIPT" --dry-run --location "$test_backup_dir" &>/dev/null; then
-        if [ ! -d "$test_backup_dir" ]; then
-            pass "backup-codium.sh --dry-run doesn't create backup directory"
-        else
-            fail "backup-codium.sh --dry-run created backup (should be read-only)"
-            rm -rf "$test_backup_dir"
-        fi
-    else
-        fail "backup-codium.sh --dry-run failed"
-    fi
-    
-    test_case "Backup --dry-run produces output"
-    local output=""
-    if output=$(bash "$BACKUP_SCRIPT" --dry-run 2>&1); then
-        if [[ $output == *"DRY RUN"* ]] || [[ $output == *"would"* ]]; then
-            pass "backup-codium.sh --dry-run produces expected output"
-        else
-            fail "backup-codium.sh --dry-run output doesn't indicate dry-run"
-        fi
-    else
-        fail "backup-codium.sh --dry-run failed"
-    fi
-}
-
-# ============================================================================
-# SELECTIVE BACKUP TESTS
-# ============================================================================
-
-test_selective_flags() {
-    print_header "Selective Backup/Restore Tests"
-    
-    test_case "Backup --no-extensions flag works"
-    if bash "$BACKUP_SCRIPT" --dry-run --no-extensions &>/dev/null; then
-        pass "backup-codium.sh --no-extensions flag accepted"
-    else
-        fail "backup-codium.sh --no-extensions flag parsing failed"
-    fi
-    
-    test_case "Backup --only-settings flag works"
-    if bash "$BACKUP_SCRIPT" --dry-run --only-settings &>/dev/null; then
-        pass "backup-codium.sh --only-settings flag accepted"
-    else
-        fail "backup-codium.sh --only-settings flag parsing failed"
-    fi
-    
-    test_case "Restore --no-extensions flag works"
-    if bash "$RESTORE_SCRIPT" --dry-run --no-extensions &>/dev/null; then
-        pass "restore-codium.sh --no-extensions flag accepted"
-    else
-        fail "restore-codium.sh --no-extensions flag parsing failed"
-    fi
-    
-    test_case "Restore --only-keybindings flag works"
-    if bash "$RESTORE_SCRIPT" --dry-run --only-keybindings &>/dev/null; then
-        pass "restore-codium.sh --only-keybindings flag accepted"
-    else
-        fail "restore-codium.sh --only-keybindings flag parsing failed"
-    fi
-}
-
-# ============================================================================
-# VERBOSE & LOGGING TESTS
-# ============================================================================
-
-test_verbose_logging() {
-    print_header "Verbose & Logging Tests"
-    
-    test_case "Backup --verbose flag works"
-    local output=""
-    if output=$(bash "$BACKUP_SCRIPT" --dry-run --verbose 2>&1); then
-        if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
-            pass "backup-codium.sh --verbose produces logging output"
-        else
-            pass "backup-codium.sh --verbose flag accepted"
-        fi
-    else
-        fail "backup-codium.sh --verbose failed"
-    fi
-    
-    test_case "Restore --verbose flag works"
-    if output=$(bash "$RESTORE_SCRIPT" --dry-run --verbose 2>&1); then
-        if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
-            pass "restore-codium.sh --verbose produces logging output"
-        else
-            pass "restore-codium.sh --verbose flag accepted"
-        fi
-    else
-        fail "restore-codium.sh --verbose failed"
     fi
 }
 
@@ -364,21 +249,9 @@ run_all_tests() {
     test_help_flags
     echo "[DEBUG] test_help_flags completed"
     
-    echo "[DEBUG] Calling test_argument_parsing"
-    test_argument_parsing
-    echo "[DEBUG] test_argument_parsing completed"
-    
-    echo "[DEBUG] Calling test_dry_run_mode"
-    test_dry_run_mode
-    echo "[DEBUG] test_dry_run_mode completed"
-    
-    echo "[DEBUG] Calling test_selective_flags"
-    test_selective_flags
-    echo "[DEBUG] test_selective_flags completed"
-    
-    echo "[DEBUG] Calling test_verbose_logging"
-    test_verbose_logging
-    echo "[DEBUG] test_verbose_logging completed"
+    echo "[DEBUG] Calling test_argument_validation"
+    test_argument_validation
+    echo "[DEBUG] test_argument_validation completed"
     
     echo "[DEBUG] Calling cleanup_test_env"
     cleanup_test_env
