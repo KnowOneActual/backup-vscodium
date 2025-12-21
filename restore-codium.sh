@@ -11,7 +11,9 @@ set -euo pipefail
 # ============================================================================
 
 readonly SCRIPT_VERSION="2.0.0"
-readonly SCRIPT_NAME="$(basename "$0")"
+SCRIPT_NAME
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
 
 # Default backup location
 DEFAULT_BACKUP_DIR="$HOME/Documents/VSCodium_Backup"
@@ -85,7 +87,8 @@ EOF
 
 log() {
     local message="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
@@ -98,7 +101,8 @@ log() {
 
 log_error() {
     local message="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
@@ -109,7 +113,8 @@ log_error() {
 
 log_success() {
     local message="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] SUCCESS: $message" >> "$LOG_FILE"
@@ -122,7 +127,8 @@ log_success() {
 
 log_warning() {
     local message="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
@@ -313,7 +319,8 @@ parse_arguments() {
 restore_file() {
     local source_file="$1"
     local dest_dir="$2"
-    local file_name=$(basename "$source_file")
+    local file_name
+    file_name="$(basename "$source_file")"
     
     if [ ! -f "$source_file" ]; then
         log_warning "File not found in backup, skipping: $file_name"
@@ -338,7 +345,8 @@ restore_file() {
 restore_directory() {
     local source_dir="$1"
     local dest_dir="$2"
-    local dir_name=$(basename "$source_dir")
+    local dir_name
+    dir_name="$(basename "$source_dir")"
     
     if [ ! -d "$source_dir" ]; then
         log_warning "Directory not found in backup, skipping: $dir_name"
@@ -346,7 +354,8 @@ restore_directory() {
     fi
     
     if [ "$DRY_RUN" = true ]; then
-        local file_count=$(find "$source_dir" -type f | wc -l)
+        local file_count
+        file_count="$(find "$source_dir" -type f | wc -l)"
         log "[DRY-RUN] Would restore $dir_name ($file_count files) -> $dest_dir/"
         return 0
     fi
@@ -374,7 +383,8 @@ restore_extensions() {
         return 1
     fi
     
-    local ext_count=$(wc -l < "$extensions_file")
+    local ext_count
+    ext_count="$(wc -l < "$extensions_file")"
     
     if [ "$DRY_RUN" = true ]; then
         log "[DRY-RUN] Would install $ext_count extensions from backup"
@@ -407,10 +417,14 @@ restore_extensions() {
 }
 
 print_summary() {
-    local settings_status="[$([ "$RESTORE_SETTINGS" = true ] && echo "✓" || echo "✗")]"
-    local keybindings_status="[$([ "$RESTORE_KEYBINDINGS" = true ] && echo "✓" || echo "✗")]"
-    local snippets_status="[$([ "$RESTORE_SNIPPETS" = true ] && echo "✓" || echo "✗")]"
-    local extensions_status="[$([ "$RESTORE_EXTENSIONS" = true ] && echo "✓" || echo "✗")]"
+    local settings_status
+    settings_status="[$([ "$RESTORE_SETTINGS" = true ] && echo "✓" || echo "✗")]"
+    local keybindings_status
+    keybindings_status="[$([ "$RESTORE_KEYBINDINGS" = true ] && echo "✓" || echo "✗")]"
+    local snippets_status
+    snippets_status="[$([ "$RESTORE_SNIPPETS" = true ] && echo "✓" || echo "✗")]"
+    local extensions_status
+    extensions_status="[$([ "$RESTORE_EXTENSIONS" = true ] && echo "✓" || echo "✗")]"
     
     echo ""
     echo "========================================"
