@@ -12,7 +12,7 @@ set -euo pipefail
 
 readonly SCRIPT_VERSION="2.0.0"
 SCRIPT_NAME
-SCRIPT_NAME="$(basename "$0")"
+SCRIPT_NAME=$(basename "$0")
 readonly SCRIPT_NAME
 
 # Default backup location
@@ -88,7 +88,7 @@ EOF
 log() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
@@ -102,7 +102,7 @@ log() {
 log_error() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
@@ -114,7 +114,7 @@ log_error() {
 log_success() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] SUCCESS: $message" >> "$LOG_FILE"
@@ -128,7 +128,7 @@ log_success() {
 log_warning() {
     local message="$1"
     local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
@@ -320,7 +320,7 @@ restore_file() {
     local source_file="$1"
     local dest_dir="$2"
     local file_name
-    file_name="$(basename "$source_file")"
+    file_name=$(basename "$source_file")
     
     if [ ! -f "$source_file" ]; then
         log_warning "File not found in backup, skipping: $file_name"
@@ -346,7 +346,7 @@ restore_directory() {
     local source_dir="$1"
     local dest_dir="$2"
     local dir_name
-    dir_name="$(basename "$source_dir")"
+    dir_name=$(basename "$source_dir")
     
     if [ ! -d "$source_dir" ]; then
         log_warning "Directory not found in backup, skipping: $dir_name"
@@ -355,7 +355,7 @@ restore_directory() {
     
     if [ "$DRY_RUN" = true ]; then
         local file_count
-        file_count="$(find "$source_dir" -type f | wc -l)"
+        file_count=$(find "$source_dir" -type f | wc -l)
         log "[DRY-RUN] Would restore $dir_name ($file_count files) -> $dest_dir/"
         return 0
     fi
@@ -384,7 +384,7 @@ restore_extensions() {
     fi
     
     local ext_count
-    ext_count="$(wc -l < "$extensions_file")"
+    ext_count=$(wc -l < "$extensions_file")
     
     if [ "$DRY_RUN" = true ]; then
         log "[DRY-RUN] Would install $ext_count extensions from backup"
