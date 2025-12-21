@@ -10,12 +10,25 @@ set -euo pipefail
 # TEST FRAMEWORK
 # ============================================================================
 
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-readonly BACKUP_SCRIPT="$PROJECT_DIR/backup-codium.sh"
-readonly RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
-readonly TEST_BACKUP_DIR="/tmp/vscodium_test_backup"
-readonly TEST_LOG="/tmp/vscodium_tests.log"
+SCRIPT_DIR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+
+PROJECT_DIR
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+readonly PROJECT_DIR
+
+BACKUP_SCRIPT="$PROJECT_DIR/backup-codium.sh"
+readonly BACKUP_SCRIPT
+
+RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
+readonly RESTORE_SCRIPT
+
+TEST_BACKUP_DIR="/tmp/vscodium_test_backup"
+readonly TEST_BACKUP_DIR
+
+TEST_LOG="/tmp/vscodium_tests.log"
+readonly TEST_LOG
 
 TEST_COUNT=0
 PASS_COUNT=0
@@ -122,6 +135,8 @@ test_script_executable() {
     print_header "Script Executable Tests"
     
     test_case "Backup script is executable"
+    # Make scripts executable for testing
+    chmod +x "$BACKUP_SCRIPT" 2>/dev/null || true
     if [ -x "$BACKUP_SCRIPT" ]; then
         pass "backup-codium.sh is executable"
     else
@@ -129,6 +144,7 @@ test_script_executable() {
     fi
     
     test_case "Restore script is executable"
+    chmod +x "$RESTORE_SCRIPT" 2>/dev/null || true
     if [ -x "$RESTORE_SCRIPT" ]; then
         pass "restore-codium.sh is executable"
     else
@@ -162,21 +178,21 @@ test_help_flags() {
     print_header "Help & Version Tests"
     
     test_case "Backup --help flag works"
-    if "$BACKUP_SCRIPT" --help &>/dev/null; then
+    if bash "$BACKUP_SCRIPT" --help &>/dev/null; then
         pass "backup-codium.sh --help executed successfully"
     else
         fail "backup-codium.sh --help failed"
     fi
     
     test_case "Restore --help flag works"
-    if "$RESTORE_SCRIPT" --help &>/dev/null; then
+    if bash "$RESTORE_SCRIPT" --help &>/dev/null; then
         pass "restore-codium.sh --help executed successfully"
     else
         fail "restore-codium.sh --help failed"
     fi
     
     test_case "Backup --version flag works"
-    if output=$("$BACKUP_SCRIPT" --version 2>&1); then
+    if output=$(bash "$BACKUP_SCRIPT" --version 2>&1); then
         if [[ $output == *"v"* ]]; then
             pass "backup-codium.sh --version returns version"
         else
@@ -187,7 +203,7 @@ test_help_flags() {
     fi
     
     test_case "Restore --version flag works"
-    if output=$("$RESTORE_SCRIPT" --version 2>&1); then
+    if output=$(bash "$RESTORE_SCRIPT" --version 2>&1); then
         if [[ $output == *"v"* ]]; then
             pass "restore-codium.sh --version returns version"
         else
@@ -206,28 +222,28 @@ test_argument_parsing() {
     print_header "Argument Parsing Tests"
     
     test_case "Backup script rejects unknown arguments"
-    if ! "$BACKUP_SCRIPT" --unknown-flag &>/dev/null; then
+    if ! bash "$BACKUP_SCRIPT" --unknown-flag &>/dev/null; then
         pass "backup-codium.sh correctly rejects unknown flags"
     else
         fail "backup-codium.sh should reject unknown flags"
     fi
     
     test_case "Restore script rejects unknown arguments"
-    if ! "$RESTORE_SCRIPT" --unknown-flag &>/dev/null; then
+    if ! bash "$RESTORE_SCRIPT" --unknown-flag &>/dev/null; then
         pass "restore-codium.sh correctly rejects unknown flags"
     else
         fail "restore-codium.sh should reject unknown flags"
     fi
     
     test_case "Backup accepts custom location"
-    if "$BACKUP_SCRIPT" --dry-run --location /tmp/test_backup &>/dev/null; then
+    if bash "$BACKUP_SCRIPT" --dry-run --location /tmp/test_backup &>/dev/null; then
         pass "backup-codium.sh accepts --location flag"
     else
         fail "backup-codium.sh --location flag parsing failed"
     fi
     
     test_case "Restore accepts custom backup path"
-    if "$RESTORE_SCRIPT" --dry-run --backup /tmp/test_backup &>/dev/null; then
+    if bash "$RESTORE_SCRIPT" --dry-run --backup /tmp/test_backup &>/dev/null; then
         pass "restore-codium.sh accepts --backup flag"
     else
         fail "restore-codium.sh --backup flag parsing failed"
@@ -243,7 +259,7 @@ test_dry_run_mode() {
     
     test_case "Backup --dry-run mode doesn't create backup"
     test_backup_dir="/tmp/backup_dryrun_test_$$"
-    if "$BACKUP_SCRIPT" --dry-run --location "$test_backup_dir" &>/dev/null; then
+    if bash "$BACKUP_SCRIPT" --dry-run --location "$test_backup_dir" &>/dev/null; then
         if [ ! -d "$test_backup_dir" ]; then
             pass "backup-codium.sh --dry-run doesn't create backup directory"
         else
@@ -255,7 +271,7 @@ test_dry_run_mode() {
     fi
     
     test_case "Backup --dry-run produces output"
-    if output=$("$BACKUP_SCRIPT" --dry-run 2>&1); then
+    if output=$(bash "$BACKUP_SCRIPT" --dry-run 2>&1); then
         if [[ $output == *"DRY RUN"* ]] || [[ $output == *"would"* ]]; then
             pass "backup-codium.sh --dry-run produces expected output"
         else
@@ -274,28 +290,28 @@ test_selective_flags() {
     print_header "Selective Backup/Restore Tests"
     
     test_case "Backup --no-extensions flag works"
-    if "$BACKUP_SCRIPT" --dry-run --no-extensions &>/dev/null; then
+    if bash "$BACKUP_SCRIPT" --dry-run --no-extensions &>/dev/null; then
         pass "backup-codium.sh --no-extensions flag accepted"
     else
         fail "backup-codium.sh --no-extensions flag parsing failed"
     fi
     
     test_case "Backup --only-settings flag works"
-    if "$BACKUP_SCRIPT" --dry-run --only-settings &>/dev/null; then
+    if bash "$BACKUP_SCRIPT" --dry-run --only-settings &>/dev/null; then
         pass "backup-codium.sh --only-settings flag accepted"
     else
         fail "backup-codium.sh --only-settings flag parsing failed"
     fi
     
     test_case "Restore --no-extensions flag works"
-    if "$RESTORE_SCRIPT" --dry-run --no-extensions &>/dev/null; then
+    if bash "$RESTORE_SCRIPT" --dry-run --no-extensions &>/dev/null; then
         pass "restore-codium.sh --no-extensions flag accepted"
     else
         fail "restore-codium.sh --no-extensions flag parsing failed"
     fi
     
     test_case "Restore --only-keybindings flag works"
-    if "$RESTORE_SCRIPT" --dry-run --only-keybindings &>/dev/null; then
+    if bash "$RESTORE_SCRIPT" --dry-run --only-keybindings &>/dev/null; then
         pass "restore-codium.sh --only-keybindings flag accepted"
     else
         fail "restore-codium.sh --only-keybindings flag parsing failed"
@@ -310,7 +326,7 @@ test_verbose_logging() {
     print_header "Verbose & Logging Tests"
     
     test_case "Backup --verbose flag works"
-    if output=$("$BACKUP_SCRIPT" --dry-run --verbose 2>&1); then
+    if output=$(bash "$BACKUP_SCRIPT" --dry-run --verbose 2>&1); then
         if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
             pass "backup-codium.sh --verbose produces logging output"
         else
@@ -321,7 +337,7 @@ test_verbose_logging() {
     fi
     
     test_case "Restore --verbose flag works"
-    if output=$("$RESTORE_SCRIPT" --dry-run --verbose 2>&1); then
+    if output=$(bash "$RESTORE_SCRIPT" --dry-run --verbose 2>&1); then
         if [[ $output == *"INFO"* ]] || [[ $output == *"["* ]]; then
             pass "restore-codium.sh --verbose produces logging output"
         else
@@ -380,7 +396,7 @@ print_test_summary() {
 # MAIN
 # ============================================================================
 
-if [ "$BASH_VERSINFO" -lt 4 ]; then
+if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
     echo "Error: This test suite requires Bash 4.0 or higher"
     exit 1
 fi
