@@ -26,6 +26,18 @@ FAIL_COUNT=0
 
 echo "" > "$TEST_LOG"
 
+echo "[DEBUG] Script paths:"
+echo "  SCRIPT_DIR: $SCRIPT_DIR"
+echo "  PROJECT_DIR: $PROJECT_DIR"
+echo "  BACKUP_SCRIPT: $BACKUP_SCRIPT"
+echo "  RESTORE_SCRIPT: $RESTORE_SCRIPT"
+echo ""
+
+echo "[DEBUG] File existence checks:"
+test -f "$BACKUP_SCRIPT" && echo "  ✓ BACKUP_SCRIPT exists" || echo "  ✗ BACKUP_SCRIPT NOT FOUND"
+test -f "$RESTORE_SCRIPT" && echo "  ✓ RESTORE_SCRIPT exists" || echo "  ✗ RESTORE_SCRIPT NOT FOUND"
+echo ""
+
 print_header() {
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
@@ -49,7 +61,6 @@ fail() {
     ((FAIL_COUNT++))
     local msg="  ✗ FAIL: $1"
     echo "$msg" | tee -a "$TEST_LOG"
-    # Don't return error - let test framework handle it
 }
 
 # ============================================================================
@@ -57,6 +68,7 @@ fail() {
 # ============================================================================
 
 setup_test_env() {
+    echo "[DEBUG] Running setup_test_env"
     # Create mock VSCodium config directory
     mkdir -p "$TEST_BACKUP_DIR"
     
@@ -73,28 +85,37 @@ cleanup_test_env() {
 # ============================================================================
 
 test_script_exists() {
+    echo "[DEBUG] Entering test_script_exists function"
     print_header "Script Existence Tests"
     
+    echo "[DEBUG] Starting test case 1: Backup script exists"
     test_case "Backup script exists"
     if [ -f "$BACKUP_SCRIPT" ]; then
+        echo "[DEBUG] Backup script found, calling pass()"
         pass "backup-codium.sh found"
     else
+        echo "[DEBUG] Backup script NOT found, calling fail()"
         fail "backup-codium.sh not found at $BACKUP_SCRIPT"
     fi
+    echo "[DEBUG] Test case 1 completed"
     
+    echo "[DEBUG] Starting test case 2: Restore script exists"
     test_case "Restore script exists"
     if [ -f "$RESTORE_SCRIPT" ]; then
+        echo "[DEBUG] Restore script found, calling pass()"
         pass "restore-codium.sh found"
     else
+        echo "[DEBUG] Restore script NOT found, calling fail()"
         fail "restore-codium.sh not found at $RESTORE_SCRIPT"
     fi
+    echo "[DEBUG] Test case 2 completed"
+    echo "[DEBUG] Exiting test_script_exists function"
 }
 
 test_script_executable() {
     print_header "Script Executable Tests"
     
     test_case "Backup script is executable"
-    # Make scripts executable for testing
     chmod +x "$BACKUP_SCRIPT" 2>/dev/null || true
     if [ -x "$BACKUP_SCRIPT" ]; then
         pass "backup-codium.sh is executable"
@@ -320,20 +341,49 @@ run_all_tests() {
     echo "🦧 backup-vscodium Test Suite"
     echo "==============================="
     
+    echo "[DEBUG] Calling setup_test_env"
     setup_test_env
+    echo "[DEBUG] setup_test_env completed"
     
+    echo "[DEBUG] Calling test_script_exists"
     test_script_exists
+    echo "[DEBUG] test_script_exists completed"
+    
+    echo "[DEBUG] Calling test_script_executable"
     test_script_executable
+    echo "[DEBUG] test_script_executable completed"
+    
+    echo "[DEBUG] Calling test_script_syntax"
     test_script_syntax
+    echo "[DEBUG] test_script_syntax completed"
+    
+    echo "[DEBUG] Calling test_help_flags"
     test_help_flags
+    echo "[DEBUG] test_help_flags completed"
+    
+    echo "[DEBUG] Calling test_argument_parsing"
     test_argument_parsing
+    echo "[DEBUG] test_argument_parsing completed"
+    
+    echo "[DEBUG] Calling test_dry_run_mode"
     test_dry_run_mode
+    echo "[DEBUG] test_dry_run_mode completed"
+    
+    echo "[DEBUG] Calling test_selective_flags"
     test_selective_flags
+    echo "[DEBUG] test_selective_flags completed"
+    
+    echo "[DEBUG] Calling test_verbose_logging"
     test_verbose_logging
+    echo "[DEBUG] test_verbose_logging completed"
     
+    echo "[DEBUG] Calling cleanup_test_env"
     cleanup_test_env
+    echo "[DEBUG] cleanup_test_env completed"
     
+    echo "[DEBUG] Calling print_test_summary"
     print_test_summary
+    echo "[DEBUG] print_test_summary completed"
 }
 
 print_test_summary() {
@@ -359,10 +409,13 @@ print_test_summary() {
 # MAIN
 # ============================================================================
 
+echo "[DEBUG] Bash version: ${BASH_VERSINFO[0]}"
 if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
     echo "Error: This test suite requires Bash 4.0 or higher"
     exit 1
 fi
 
+echo "[DEBUG] Calling run_all_tests"
 run_all_tests
+echo "[DEBUG] run_all_tests completed with exit code $?"
 exit $?
