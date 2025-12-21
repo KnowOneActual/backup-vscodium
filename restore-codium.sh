@@ -10,8 +10,10 @@ set -euo pipefail
 # CONFIGURATION & DEFAULTS
 # ============================================================================
 
-readonly SCRIPT_VERSION="2.0.0"
-readonly SCRIPT_NAME=$(basename "$0")
+SCRIPT_VERSION="2.0.0"
+readonly SCRIPT_VERSION
+SCRIPT_NAME=$(basename "$0")
+readonly SCRIPT_NAME
 
 # Default backup location
 DEFAULT_BACKUP_DIR="$HOME/Documents/VSCodium_Backup"
@@ -416,13 +418,25 @@ restore_extensions() {
 
 print_summary() {
     local settings_status
-    settings_status="[$([ "$RESTORE_SETTINGS" = true ] && echo "✓" || echo "✗")]"
+    settings_status="[✓]"
+    if [ "$RESTORE_SETTINGS" != true ]; then
+        settings_status="[✗]"
+    fi
     local keybindings_status
-    keybindings_status="[$([ "$RESTORE_KEYBINDINGS" = true ] && echo "✓" || echo "✗")]"
+    keybindings_status="[✓]"
+    if [ "$RESTORE_KEYBINDINGS" != true ]; then
+        keybindings_status="[✗]"
+    fi
     local snippets_status
-    snippets_status="[$([ "$RESTORE_SNIPPETS" = true ] && echo "✓" || echo "✗")]"
+    snippets_status="[✓]"
+    if [ "$RESTORE_SNIPPETS" != true ]; then
+        snippets_status="[✗]"
+    fi
     local extensions_status
-    extensions_status="[$([ "$RESTORE_EXTENSIONS" = true ] && echo "✓" || echo "✗")]"
+    extensions_status="[✓]"
+    if [ "$RESTORE_EXTENSIONS" != true ]; then
+        extensions_status="[✗]"
+    fi
     
     echo ""
     echo "========================================"
