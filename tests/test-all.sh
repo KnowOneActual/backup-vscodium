@@ -10,14 +10,9 @@ set -euo pipefail
 # TEST FRAMEWORK
 # ============================================================================
 
-SCRIPT_DIR
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-readonly SCRIPT_DIR
-
-PROJECT_DIR
-PROJECT_DIR=$(dirname "$SCRIPT_DIR")
-readonly PROJECT_DIR
-
+# shellcheck disable=SC2317
+readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+readonly PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 readonly BACKUP_SCRIPT="$PROJECT_DIR/backup-codium.sh"
 readonly RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
 readonly TEST_BACKUP_DIR="/tmp/vscodium_test_backup"
