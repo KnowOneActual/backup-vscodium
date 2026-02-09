@@ -2,7 +2,7 @@
 
 # backup-codium.sh
 # A robust script to back up VSCodium settings, keybindings, snippets, and extensions.
-# Supports custom backup locations, selective backups, dry-run mode, and comprehensive logging.
+# Supports custom backup locations, selective backups, dry-run mode, compression, and comprehensive logging.
 
 set -euo pipefail
 
@@ -10,7 +10,7 @@ set -euo pipefail
 # CONFIGURATION & DEFAULTS
 # ============================================================================
 
-SCRIPT_VERSION="2.0.1"
+SCRIPT_VERSION="2.1.0"
 readonly SCRIPT_VERSION
 SCRIPT_NAME=$(basename "$0")
 readonly SCRIPT_NAME
@@ -32,6 +32,7 @@ BACKUP_EXTENSIONS=true
 CREATE_CHECKSUMS=true
 CREATE_MANIFEST=true
 INCLUDE_TIMESTAMP=false
+COMPRESS_BACKUP=false
 
 # Detected OS
 OS_NAME=""
@@ -55,6 +56,7 @@ OPTIONS:
     --dry-run               Preview what would be backed up without copying
     -l, --location PATH     Custom backup location (default: $DEFAULT_BACKUP_DIR)
     -t, --timestamp         Add timestamp to backup folder name
+    -c, --compress          Create a compressed .tar.gz archive (easier for moving to new machines)
     
 SELECTIVE BACKUP OPTIONS:
     --only-settings         Backup only settings.json
@@ -72,28 +74,21 @@ EXAMPLES:
     # Backup everything to default location
     $SCRIPT_NAME
 
+    # Create a compressed backup (best for new machines)
+    $SCRIPT_NAME --compress --timestamp
+
     # Backup to custom location
     $SCRIPT_NAME --location ~/Dropbox/VSCodium_Backup
 
-    # Backup with timestamp
-    $SCRIPT_NAME --timestamp
-
     # Dry run to preview what would be backed up
     $SCRIPT_NAME --dry-run
-
-    # Backup only settings and extensions
-    $SCRIPT_NAME --no-keybindings --no-snippets
-
-    # Verbose output with timestamp
-    $SCRIPT_NAME --verbose --timestamp
-
 EOF
 }
 
 log() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
@@ -107,7 +102,7 @@ log() {
 log_error() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
@@ -119,7 +114,7 @@ log_error() {
 log_success() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] SUCCESS: $message" >> "$LOG_FILE"
@@ -133,7 +128,7 @@ log_success() {
 log_warning() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
@@ -227,6 +222,10 @@ parse_arguments() {
                 INCLUDE_TIMESTAMP=true
                 shift
                 ;;
+            -c|--compress)
+                COMPRESS_BACKUP=true
+                shift
+                ;;
             --only-settings)
                 BACKUP_KEYBINDINGS=false
                 BACKUP_SNIPPETS=false
@@ -292,7 +291,7 @@ backup_file() {
     local source_file="$1"
     local dest_dir="$2"
     local file_name
-    file_name=$(basename "$source_file")
+    file_name="$(basename "$source_file")"
     
     if [ ! -f "$source_file" ]; then
         log_warning "File not found, skipping: $source_file"
@@ -318,7 +317,7 @@ backup_directory() {
     local source_dir="$1"
     local dest_dir="$2"
     local dir_name
-    dir_name=$(basename "$source_dir")
+    dir_name="$(basename "$source_dir")"
     
     if [ ! -d "$source_dir" ]; then
         log_warning "Directory not found, skipping: $source_dir"
@@ -407,6 +406,7 @@ create_manifest() {
         echo "Created: $(date '+%Y-%m-%d %H:%M:%S')"
         echo "Hostname: $(hostname)"
         echo "OS: $OS_NAME"
+        echo "Compressed: $COMPRESS_BACKUP"
         echo ""
         echo "Backed Up Components:"
         [ "$BACKUP_SETTINGS" = true ] && echo "  ✓ Settings"
@@ -422,34 +422,50 @@ create_manifest() {
     return 0
 }
 
+compress_backup() {
+    local parent_dir
+    parent_dir=$(dirname "$BACKUP_DIR")
+    local target_dir
+    target_dir=$(basename "$BACKUP_DIR")
+    local archive_name="${BACKUP_DIR}.tar.gz"
+    
+    if [ "$DRY_RUN" = true ]; then
+        log "[DRY-RUN] Would compress backup to: $archive_name"
+        return 0
+    fi
+    
+    log "Compressing backup to $archive_name..."
+    
+    if tar -czf "$archive_name" -C "$parent_dir" "$target_dir"; then
+        log_success "Backup compressed successfully: $archive_name"
+        echo "📦 Compressed archive created: $archive_name"
+    else
+        log_error "Failed to create compressed archive"
+        return 1
+    fi
+}
+
 print_summary() {
-    local settings_status
-    settings_status="[✓]"
-    if [ "$BACKUP_SETTINGS" != true ]; then
-        settings_status="[✗]"
-    fi
-    local keybindings_status
-    keybindings_status="[✓]"
-    if [ "$BACKUP_KEYBINDINGS" != true ]; then
-        keybindings_status="[✗]"
-    fi
-    local snippets_status
-    snippets_status="[✓]"
-    if [ "$BACKUP_SNIPPETS" != true ]; then
-        snippets_status="[✗]"
-    fi
-    local extensions_status
-    extensions_status="[✓]"
-    if [ "$BACKUP_EXTENSIONS" != true ]; then
-        extensions_status="[✗]"
-    fi
+    local settings_status="[✓]"
+    [ "$BACKUP_SETTINGS" != true ] && settings_status="[✗]"
+    
+    local keybindings_status="[✓]"
+    [ "$BACKUP_KEYBINDINGS" != true ] && keybindings_status="[✗]"
+    
+    local snippets_status="[✓]"
+    [ "$BACKUP_SNIPPETS" != true ] && snippets_status="[✗]"
+    
+    local extensions_status="[✓]"
+    [ "$BACKUP_EXTENSIONS" != true ] && extensions_status="[✗]"
     
     echo ""
     echo "========================================"
     echo "         BACKUP SUMMARY"
     echo "========================================"
     echo "Backup Location: $BACKUP_DIR"
-    echo "Backup Size: $(du -sh "$BACKUP_DIR" 2>/dev/null | cut -f1)"
+    if [ "$COMPRESS_BACKUP" = true ] && [ "$DRY_RUN" = false ]; then
+        echo "Archive: ${BACKUP_DIR}.tar.gz"
+    fi
     echo ""
     echo "Components:"
     echo "  $settings_status Settings"
@@ -525,6 +541,10 @@ main() {
     
     [ "$CREATE_MANIFEST" = true ] && [ "$DRY_RUN" = false ] && \
         create_manifest
+    
+    # Compress if requested
+    [ "$COMPRESS_BACKUP" = true ] && \
+        compress_backup
     
     # Print summary
     print_summary

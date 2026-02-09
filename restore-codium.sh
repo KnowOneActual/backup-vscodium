@@ -2,7 +2,7 @@
 
 # restore-codium.sh
 # A robust script to restore VSCodium settings from a backup.
-# Includes validation via checksums, dry-run mode, selective restore, and safety prompts.
+# Includes validation via checksums, dry-run mode, selective restore, safety prompts, and archive support.
 
 set -euo pipefail
 
@@ -10,7 +10,7 @@ set -euo pipefail
 # CONFIGURATION & DEFAULTS
 # ============================================================================
 
-SCRIPT_VERSION="2.0.1"
+SCRIPT_VERSION="2.1.0"
 readonly SCRIPT_VERSION
 SCRIPT_NAME=$(basename "$0")
 readonly SCRIPT_NAME
@@ -24,6 +24,8 @@ LOG_FILE=""
 VERBOSE=false
 DRY_RUN=false
 FORCE=false
+IS_ARCHIVE=false
+TEMP_DIR=""
 
 # Restore options
 RESTORE_SETTINGS=true
@@ -52,7 +54,7 @@ OPTIONS:
     -v, --version           Show script version
     --verbose               Enable verbose output
     --dry-run               Preview what would be restored without copying
-    -b, --backup PATH       Path to backup folder (default: $DEFAULT_BACKUP_DIR)
+    -b, --backup PATH       Path to backup folder OR .tar.gz/.zip archive
     -f, --force             Skip confirmation prompts
     --skip-verify           Don't verify checksums before restoring
     
@@ -70,25 +72,21 @@ EXAMPLES:
     # Restore everything from default location (interactive)
     $SCRIPT_NAME
 
-    # Restore from custom backup location
+    # Restore from a compressed archive (Easy Mode)
+    $SCRIPT_NAME --backup ~/Downloads/VSCodium_Backup.tar.gz
+
+    # Restore from custom backup folder
     $SCRIPT_NAME --backup ~/Dropbox/VSCodium_Backup
 
     # Dry run to preview restore
     $SCRIPT_NAME --dry-run
-
-    # Restore only settings and keybindings
-    $SCRIPT_NAME --no-snippets --no-extensions
-
-    # Force restore without confirmation (careful!)
-    $SCRIPT_NAME --force --verbose
-
 EOF
 }
 
 log() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
@@ -102,7 +100,7 @@ log() {
 log_error() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] ERROR: $message" >> "$LOG_FILE"
@@ -114,7 +112,7 @@ log_error() {
 log_success() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] SUCCESS: $message" >> "$LOG_FILE"
@@ -128,7 +126,7 @@ log_success() {
 log_warning() {
     local message="$1"
     local timestamp
-    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
     if [ -n "$LOG_FILE" ]; then
         echo "[$timestamp] WARNING: $message" >> "$LOG_FILE"
@@ -158,8 +156,21 @@ detect_os() {
 }
 
 validate_backup_location() {
+    # Handle Archives
+    if [ -f "$BACKUP_DIR" ]; then
+        if [[ "$BACKUP_DIR" == *.tar.gz ]] || [[ "$BACKUP_DIR" == *.tgz ]] || [[ "$BACKUP_DIR" == *.zip ]]; then
+            IS_ARCHIVE=true
+            log "Detected backup archive: $BACKUP_DIR"
+            return 0
+        else
+            log_error "File found at backup path, but not a recognized archive format (.tar.gz, .tgz, .zip)"
+            exit 1
+        fi
+    fi
+
+    # Handle Directories
     if [ ! -d "$BACKUP_DIR" ]; then
-        log_error "Backup directory not found: $BACKUP_DIR"
+        log_error "Backup directory/file not found: $BACKUP_DIR"
         exit 1
     fi
     
@@ -169,6 +180,48 @@ validate_backup_location() {
     fi
     
     log "Backup location validated: $BACKUP_DIR"
+}
+
+extract_archive() {
+    if [ "$DRY_RUN" = true ]; then
+        log "[DRY-RUN] Would extract archive: $BACKUP_DIR"
+        return 0
+    fi
+    
+    TEMP_DIR=$(mktemp -d)
+    log "Extracting archive to temporary location: $TEMP_DIR"
+    
+    if [[ "$BACKUP_DIR" == *.zip ]]; then
+        if ! command -v unzip &> /dev/null; then
+            log_error "'unzip' command not found, cannot extract .zip archive"
+            rm -rf "$TEMP_DIR"
+            exit 1
+        fi
+        unzip -q "$BACKUP_DIR" -d "$TEMP_DIR"
+    else
+        tar -xzf "$BACKUP_DIR" -C "$TEMP_DIR"
+    fi
+    
+    # Handle archives that contain a root folder (e.g. VSCodium_Backup_...)
+    # We look for the first directory that looks like a backup, or just use the extraction root
+    local extracted_root
+    extracted_root=$(find "$TEMP_DIR" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+    
+    if [ -z "$extracted_root" ]; then
+        # No subdirectory, assume flat archive
+        extracted_root="$TEMP_DIR"
+    fi
+    
+    # Point BACKUP_DIR to the extracted content
+    BACKUP_DIR="$extracted_root"
+    log "Backup extracted to: $BACKUP_DIR"
+}
+
+cleanup() {
+    if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+        log "Cleaning up temporary files..."
+        rm -rf "$TEMP_DIR"
+    fi
 }
 
 check_codium_command() {
@@ -320,7 +373,7 @@ restore_file() {
     local source_file="$1"
     local dest_dir="$2"
     local file_name
-    file_name=$(basename "$source_file")
+    file_name="$(basename "$source_file")"
     
     if [ ! -f "$source_file" ]; then
         log_warning "File not found in backup, skipping: $file_name"
@@ -346,7 +399,7 @@ restore_directory() {
     local source_dir="$1"
     local dest_dir="$2"
     local dir_name
-    dir_name=$(basename "$source_dir")
+    dir_name="$(basename "$source_dir")"
     
     if [ ! -d "$source_dir" ]; then
         log_warning "Directory not found in backup, skipping: $dir_name"
@@ -417,26 +470,17 @@ restore_extensions() {
 }
 
 print_summary() {
-    local settings_status
-    settings_status="[✓]"
-    if [ "$RESTORE_SETTINGS" != true ]; then
-        settings_status="[✗]"
-    fi
-    local keybindings_status
-    keybindings_status="[✓]"
-    if [ "$RESTORE_KEYBINDINGS" != true ]; then
-        keybindings_status="[✗]"
-    fi
-    local snippets_status
-    snippets_status="[✓]"
-    if [ "$RESTORE_SNIPPETS" != true ]; then
-        snippets_status="[✗]"
-    fi
-    local extensions_status
-    extensions_status="[✓]"
-    if [ "$RESTORE_EXTENSIONS" != true ]; then
-        extensions_status="[✗]"
-    fi
+    local settings_status="[✓]"
+    [ "$RESTORE_SETTINGS" != true ] && settings_status="[✗]"
+    
+    local keybindings_status="[✓]"
+    [ "$RESTORE_KEYBINDINGS" != true ] && keybindings_status="[✗]"
+    
+    local snippets_status="[✓]"
+    [ "$RESTORE_SNIPPETS" != true ] && snippets_status="[✗]"
+    
+    local extensions_status="[✓]"
+    [ "$RESTORE_EXTENSIONS" != true ] && extensions_status="[✗]"
     
     echo ""
     echo "========================================"
@@ -465,15 +509,27 @@ print_summary() {
 main() {
     parse_arguments "$@"
     
+    # Register cleanup trap
+    trap cleanup EXIT
+    
     # Setup logging
-    LOG_FILE="$BACKUP_DIR/restore.log"
+    # Note: If extracting from archive, this might be temporary
+    # We'll set it correctly after extraction logic potentially runs
     
     # Detect OS and set paths
     detect_os
     check_codium_command || true
     
-    # Validate backup location
+    # Validate backup location (handles archives)
     validate_backup_location
+    
+    # Extract archive if needed
+    if [ "$IS_ARCHIVE" = true ]; then
+        extract_archive
+    fi
+    
+    # Now that we have a final directory, set log file
+    LOG_FILE="$BACKUP_DIR/restore.log"
     
     # Print startup info
     if [ "$DRY_RUN" = true ]; then

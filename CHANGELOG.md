@@ -5,6 +5,25 @@ All notable changes to backup-vscodium will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [2.1.0] - 2026-02-08
+
+### Added
+
+* **Portable Backups:** Added a `--compress` flag to `backup-codium.sh` to create a single `.tar.gz` archive instead of a folder.
+* **Archive Restore:** Updated `restore-codium.sh` to accept `.tar.gz` or `.zip` files directly via the `--backup` argument.
+* **Smart Extraction:** The restore script now automatically detects if the input is an archive, extracts it to a temporary location, and cleans up afterward.
+
+### Changed
+
+* Updated script versions to `2.1.0`.
+* Improved validation logic in `restore-codium.sh` to handle both directories and file archives.
+
+### Removed
+
+* Removed redundant documentation files to declutter the repository (`START_HERE.md`, `INDEX.md`, `docs/COMPLETION_REPORT.md`, etc.).
+
+
 ## [2.0.0] - 2025-12-21
 
 ### Added
