@@ -1,4 +1,11 @@
-# 🦧 backup-vscodium
+<p align="center">
+<img src="assets/img/backup-vscodium_logo.webp" alt=" Cool Backup VScodium Logo Here" width="200">
+</p>
+
+<br>
+<br>
+
+# Backup VScodium
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Build Status](https://github.com/KnowOneActual/backup-vscodium/actions/workflows/test.yml/badge.svg)](https://github.com/KnowOneActual/backup-vscodium/actions/workflows/test.yml)
