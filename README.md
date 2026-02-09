@@ -237,8 +237,4 @@ Contributions are welcome! Please ensure any changes pass the test suite and do 
 
 ## 📝 License
 
-[MIT License](https://www.google.com/search?q=LICENSE) © 2026 Beau Bremer
-
-```
-
-```
+[MIT License](LICENSE) © 2026 Beau Bremer
