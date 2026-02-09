@@ -1,9 +1,6 @@
 <p align="center">
-<img src="assets/img/backup-vscodium_logo.webp" alt=" Cool Backup VScodium Logo Here" width="200">
+<img src="assets/img/backup-vscodium_logo.webp" alt=" Cool Backup VScodium Logo Here" width="150">
 </p>
-
-<br>
-<br>
 
 # Backup VScodium
 
