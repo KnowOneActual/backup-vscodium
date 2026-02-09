@@ -1,43 +1,45 @@
 # 🦧 backup-vscodium
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build Status](https://github.com/KnowOneActual/backup-vscodium/actions/workflows/test.yml/badge.svg)](https://github.com/KnowOneActual/backup-vscodium/actions/workflows/test.yml)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-gray.svg)]()
+[![Bash](https://img.shields.io/badge/language-Bash-4EAA25.svg)]()
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)]()
+
 A robust, feature-rich backup and restore solution for VSCodium configuration, settings, keybindings, snippets, and extensions.
 
-**Status:** ✅ All tests passing | 🟢 Production ready
+**Current Version:** 2.1.0
 
 ---
 
 ## ✨ Features
 
 ✅ **Complete Configuration Backup**
-- Settings (settings.json)
-- Keybindings (keybindings.json)
+- Settings (`settings.json`)
+- Keybindings (`keybindings.json`)
 - Code snippets
 - Installed extensions
 
-✅ **Smart Backup Options**
+✅ **Portable Backups (New!)**
+- **Single File Archives:** Create `.tar.gz` compressed backups for easy transfer.
+- **Smart Restore:** Automatically detects and extracts archives during restore.
+- **Cross-Machine Ready:** Perfect for syncing settings between computers.
+
+✅ **Smart Options**
 - Custom backup locations
-- Selective backup/restore (choose what to backup)
-- Timestamps for versioned backups
+- Selective backup/restore (choose what to sync)
+- Timestamps for version control
 - Checksum verification for integrity
-- Manifest files for metadata
 
-✅ **Safety Features**
+✅ **Safety First**
 - Dry-run mode to preview changes
-- Checksum verification before restore
-- Confirmation prompts
+- Confirmation prompts prevents accidental overwrites
 - Comprehensive logging
-- Content preservation
-
-✅ **Cross-Platform Support**
-- macOS (Application Support directories)
-- Linux (.config directories)
-- Easy to extend to Windows/other platforms
 
 ✅ **Professional Grade**
 - Bash 4.0+ compatible
-- ShellCheck clean (zero warnings)
+- ShellCheck clean
 - Comprehensive test coverage
-- Production-ready error handling
 
 ---
 
@@ -47,7 +49,7 @@ A robust, feature-rich backup and restore solution for VSCodium configuration, s
 
 ```bash
 # Clone the repository
-git clone https://github.com/KnowOneActual/backup-vscodium.git
+git clone [https://github.com/KnowOneActual/backup-vscodium.git](https://github.com/KnowOneActual/backup-vscodium.git)
 cd backup-vscodium
 
 # Make scripts executable
@@ -56,32 +58,33 @@ chmod +x backup-codium.sh restore-codium.sh
 # (Optional) Add to your PATH
 cp backup-codium.sh ~/.local/bin/
 cp restore-codium.sh ~/.local/bin/
+
 ```
 
-### Basic Backup
+### 📦 The "Portable" Workflow (Recommended)
+
+The easiest way to move your settings to a new machine:
 
 ```bash
-# Backup everything to default location (~/Documents/VSCodium_Backup)
+# 1. Create a compressed backup file
+./backup-codium.sh --compress --timestamp
+
+# 2. Transfer the resulting .tar.gz file to your new machine...
+
+# 3. Restore directly from the archive
+./restore-codium.sh --backup path/to/backup_20260208.tar.gz
+
+```
+
+### Basic Usage
+
+```bash
+# Standard backup (creates a folder in ~/Documents/VSCodium_Backup)
 ./backup-codium.sh
 
-# See what would be backed up (dry-run)
-./backup-codium.sh --dry-run
-
-# Backup with verbose output
-./backup-codium.sh --verbose
-```
-
-### Basic Restore
-
-```bash
-# Restore everything from default location
+# Standard restore (reads from default location)
 ./restore-codium.sh
 
-# Preview restore without making changes
-./restore-codium.sh --dry-run
-
-# Restore without confirmation prompts
-./restore-codium.sh --force
 ```
 
 ---
@@ -90,345 +93,152 @@ cp restore-codium.sh ~/.local/bin/
 
 ### Backup Examples
 
-#### Backup to Custom Location
-```bash
-# Backup to Dropbox for cloud sync
-./backup-codium.sh --location ~/Dropbox/VSCodium_Backup
+#### Create a Compressed Archive
 
-# Backup to external drive
-./backup-codium.sh --location /Volumes/ExternalDrive/Backups
+```bash
+# Great for email, cloud storage, or USB drives
+./backup-codium.sh --compress
+
 ```
 
-#### Create Versioned Backups
-```bash
-# Add timestamp to backup folder
-./backup-codium.sh --timestamp
-# Creates: ~/Documents/VSCodium_Backup_20251221_152345
+#### Backup to Custom Location
 
-# Combine with custom location
-./backup-codium.sh --location ~/Dropbox/VSCodium --timestamp
+```bash
+# Backup to Dropbox
+./backup-codium.sh --location ~/Dropbox/VSCodium_Backup
+
 ```
 
 #### Selective Backups
+
 ```bash
-# Backup only settings
-./backup-codium.sh --only-settings
+# Backup ONLY settings and keybindings (skip extensions)
+./backup-codium.sh --only-settings --only-keybindings
 
-# Backup only keybindings and snippets
-./backup-codium.sh --no-settings --no-extensions
-
-# Backup only extensions list (useful for quick reinstall)
+# Backup ONLY the extensions list (fastest)
 ./backup-codium.sh --only-extensions
-```
 
-#### Advanced Backup Options
-```bash
-# Backup without checksums (faster, less storage)
-./backup-codium.sh --no-checksums
-
-# Backup without manifest file
-./backup-codium.sh --no-manifest
-
-# Exclude everything except settings
-./backup-codium.sh --only-settings --verbose
-```
-
-#### Full Example: Automated Daily Backup
-```bash
-# Add to crontab for daily backups at 2 AM
-0 2 * * * /path/to/backup-codium.sh --location ~/Backups/VSCodium --timestamp --verbose >> /tmp/vscodium_backup.log 2>&1
 ```
 
 ### Restore Examples
 
-#### Basic Restore
+#### Restore from Archive
+
 ```bash
-# Restore from default location (interactive - asks for confirmation)
-./restore-codium.sh
+# The script automatically handles .tar.gz or .zip files
+./restore-codium.sh --backup ~/Downloads/my-backup.tar.gz
 
-# Restore from custom location
-./restore-codium.sh --backup ~/Dropbox/VSCodium_Backup
+```
 
-# Restore and skip confirmation
+#### Automated/Silent Restore
+
+```bash
+# Restore without asking for confirmation (useful for setup scripts)
 ./restore-codium.sh --force
+
 ```
 
-#### Selective Restore
+#### Dry Run (Safety Check)
+
 ```bash
-# Restore only settings
-./restore-codium.sh --only-settings
-
-# Restore only keybindings and snippets (skip extensions)
-./restore-codium.sh --no-extensions
-
-# Restore only extensions (for quick setup on new machine)
-./restore-codium.sh --only-extensions
-```
-
-#### Advanced Restore Options
-```bash
-# Restore without checksum verification (faster, less safe)
-./restore-codium.sh --skip-verify
-
-# Restore with verbose logging
-./restore-codium.sh --verbose
-
-# Preview what would be restored
-./restore-codium.sh --dry-run --verbose
-```
-
-#### Real-World Scenarios
-
-**Scenario 1: New Machine Setup**
-```bash
-# Preview what you're restoring
-./restore-codium.sh --backup ~/Dropbox/VSCodium_Backup --dry-run
-
-# Verify everything looks good, then restore
-./restore-codium.sh --backup ~/Dropbox/VSCodium_Backup --force
-
-# Restart VSCodium to apply settings
-```
-
-**Scenario 2: Restore Only Settings (Keep Local Extensions)**
-```bash
-# You've installed local extensions you want to keep
-# Restore only settings and keybindings
-./restore-codium.sh --no-extensions --force
-```
-
-**Scenario 3: Test Restore Before Committing**
-```bash
-# Always use dry-run first
+# See exactly what would happen without changing anything
 ./restore-codium.sh --dry-run --verbose
 
-# Review the output, then commit
-./restore-codium.sh --force
 ```
 
 ---
 
 ## 🔧 Command Reference
 
-### backup-codium.sh
+### `backup-codium.sh`
 
-```bash
+```text
 Usage: backup-codium.sh [OPTIONS]
 
 General Options:
   -h, --help              Show help message
   -v, --version           Show script version
+  -c, --compress          Create a compressed .tar.gz archive
+  -t, --timestamp         Add timestamp to backup name
+  -l, --location PATH     Custom backup location (default: ~/Documents/VSCodium_Backup)
   --verbose               Enable verbose output
   --dry-run               Preview without copying
-  -l, --location PATH     Custom backup location (default: ~/Documents/VSCodium_Backup)
-  -t, --timestamp         Add timestamp to backup folder name
 
 Selective Backup:
   --only-settings         Backup only settings.json
   --only-keybindings      Backup only keybindings.json
   --only-snippets         Backup only snippets directory
   --only-extensions       Backup only extensions list
-  --no-settings           Exclude settings.json
-  --no-keybindings        Exclude keybindings.json
-  --no-snippets           Exclude snippets directory
-  --no-extensions         Exclude extensions list
   --no-checksums          Don't create SHA256 checksums
   --no-manifest           Don't create manifest file
+
 ```
 
-### restore-codium.sh
+### `restore-codium.sh`
 
-```bash
+```text
 Usage: restore-codium.sh [OPTIONS]
 
 General Options:
   -h, --help              Show help message
   -v, --version           Show script version
-  --verbose               Enable verbose output
-  --dry-run               Preview without restoring
-  -b, --backup PATH       Path to backup folder (default: ~/Documents/VSCodium_Backup)
+  -b, --backup PATH       Path to backup folder OR .tar.gz/.zip archive
   -f, --force             Skip confirmation prompts
   --skip-verify           Don't verify checksums
+  --verbose               Enable verbose output
+  --dry-run               Preview without restoring
 
 Selective Restore:
   --only-settings         Restore only settings.json
   --only-keybindings      Restore only keybindings.json
-  --only-snippets         Restore only snippets directory
   --only-extensions       Restore only extensions list
-  --no-settings           Exclude settings.json
-  --no-keybindings        Exclude keybindings.json
-  --no-snippets           Exclude snippets directory
-  --no-extensions         Exclude extensions list
+
 ```
 
 ---
 
 ## 📋 What Gets Backed Up
 
-### Settings (settings.json)
-Your editor preferences:
-- Font family and size
-- Editor behavior (tabs, spaces, formatting)
-- Theme and color scheme
-- Window settings
-- Workspace settings
-
-### Keybindings (keybindings.json)
-Your custom keyboard shortcuts for:
-- Commands and actions
-- Extensions
-- Built-in functionality
-
-### Snippets Directory
-All code snippets across:
-- All programming languages
-- Custom snippet groups
-- Snippet metadata
-
-### Extensions List (extensions.txt)
-List of installed extensions with version information for easy reinstallation.
-
-### Metadata
-- **manifest.txt** - Backup contents and metadata
-- **backup.sha256** - Checksums for integrity verification
-- **backup.log** - Operation log with timestamps
+1. **Settings:** `settings.json` (Themes, fonts, preferences)
+2. **Keybindings:** `keybindings.json` (Custom shortcuts)
+3. **Snippets:** All files in your snippets directory
+4. **Extensions:** A verified list of installed extensions (restored via `codium --install-extension`)
+5. **Metadata:** Checksums and manifests to ensure data integrity.
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & Quality
 
-### Unit Tests
-```bash
-# Run basic functionality tests
-bash tests/test-all.sh
-```
+This project maintains high standards for reliability:
 
-Tests:
-- ✅ Script existence and executability
-- ✅ Bash syntax validation
-- ✅ Help and version flags
-- ✅ Error handling
+* **Unit Tests:** Run `bash tests/test-all.sh` to verify script logic.
+* **Integration Tests:** Run `bash tests/integration-tests.sh` to simulate real backups/restores.
+* **Linting:** All scripts are **ShellCheck** clean.
 
-### Integration Tests
-```bash
-# Run real backup/restore tests with mock configs
-bash tests/integration-tests.sh
-```
-
-Tests:
-- ✅ Actual backup operations
-- ✅ Selective backup functionality
-- ✅ Dry-run mode
-- ✅ Restore operations
-- ✅ Content preservation
-
-### Code Quality
-```bash
-# Check shell script syntax
-bash -n backup-codium.sh
-bash -n restore-codium.sh
-
-# Run ShellCheck linting
-shellcheck -x backup-codium.sh
-shellcheck -x restore-codium.sh
-```
-
----
-
-## 📖 Documentation
-
-- **[TESTING.md](TESTING.md)** - Comprehensive testing guide and troubleshooting
-- **[.github/workflows/test.yml](.github/workflows/test.yml)** - CI/CD pipeline configuration
+For more details on running tests, see [TESTING.md](TESTING.md).
 
 ---
 
 ## 🐛 Troubleshooting
 
-### "VSCodium config directory not found"
-```bash
-# Verify VSCodium is installed
-which codium
-
-# Check if config directory exists
-ls -la ~/.config/VSCodium  # Linux
-ls -la ~/Library/Application\ Support/VSCodium  # macOS
-```
-
-### "No write permission for backup location"
-```bash
-# Check directory permissions
-ls -ld ~/Documents/VSCodium_Backup
-
-# Create with proper permissions
-mkdir -p ~/Backups/VSCodium
-chmod 755 ~/Backups/VSCodium
-```
-
-### "codium command not found"
-```bash
-# The script will skip extension backup/restore
-# This is normal if you're not using the codium CLI
-# Extensions can be managed through the UI
-
-# To install codium command, check your package manager
-apt install vscodium  # Ubuntu/Debian
-brew install vscodium  # macOS
-```
-
-### "Checksum verification failed"
-```bash
-# Your backup may be corrupted
-# You can skip verification and restore anyway:
-./restore-codium.sh --skip-verify
-
-# But it's safer to create a fresh backup
-./backup-codium.sh --location ~/Backups/VSCodium_Fresh
-```
+| Issue | Solution |
+| --- | --- |
+| **VSCodium config not found** | Ensure VSCodium is installed and you have run it at least once. |
+| **Checksum failed** | The backup file might be corrupted. Try restoring with `--skip-verify` if you are desperate. |
+| **Permission denied** | Check that you have write access to the destination folder. |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
-
-1. Test your changes:
-   ```bash
-   bash tests/test-all.sh
-   bash tests/integration-tests.sh
-   shellcheck -x backup-codium.sh restore-codium.sh
-   ```
-
-2. Ensure no ShellCheck warnings
-
-3. Add tests for new features
-
-4. Update documentation
+Contributions are welcome! Please ensure any changes pass the test suite and do not introduce ShellCheck warnings.
 
 ---
 
 ## 📝 License
 
-MIT License - See LICENSE file for details
+[MIT License](https://www.google.com/search?q=LICENSE) © 2026 Beau Bremer
 
----
+```
 
-## 🙋 Support
-
-Have questions or issues?
-
-1. Check [TESTING.md](TESTING.md) for common issues
-2. Review the examples above
-3. Run with `--verbose --dry-run` to see what's happening
-4. Open an issue with your error message and logs
-
----
-
-## 🎉 Acknowledgments
-
-Built with:
-- Bash scripting best practices
-- Comprehensive testing and CI/CD
-- Cross-platform compatibility
-- User-friendly design
-
-**Happy backing up!** 🦧
+```
