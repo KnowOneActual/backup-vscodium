@@ -25,3 +25,11 @@ __pycache__/
 .venv
 #folders
 temp_logs
+
+# Internal Agent Files
+linear_ticket_*.md
+[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/
+research_*.md
+plan_*.md
+research_review.md
+plan_review.md
