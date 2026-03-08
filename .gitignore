@@ -23,3 +23,5 @@ __pycache__/
 .idea/
 .vagrant
 .venv
+#folders
+temp_logs

@@ -371,11 +371,11 @@ create_checksums() {
         return 0
     fi
     
-    local hasher=""
+    local hasher=()
     if command -v sha256sum &> /dev/null; then
-        hasher="sha256sum"
+        hasher=("sha256sum")
     elif command -v shasum &> /dev/null; then
-        hasher="shasum -a 256"
+        hasher=("shasum" "-a" "256")
     else
         log_warning "No SHA256 hasher (sha256sum or shasum) available, skipping checksum generation"
         return 1
@@ -383,7 +383,7 @@ create_checksums() {
     
     cd "$BACKUP_DIR" || return 1
     find . -type f ! -name "backup.sha256" ! -name "manifest.txt" ! -name "*.log" -print0 | \
-        xargs -0 $hasher > "$checksums_file" 2>/dev/null || {
+        xargs -0 "${hasher[@]}" > "$checksums_file" 2>/dev/null || {
         log_error "Failed to create checksums"
         cd - > /dev/null
         return 1

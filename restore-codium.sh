@@ -239,11 +239,11 @@ verify_checksums() {
         return 0
     fi
     
-    local verifier=""
+    local verifier=()
     if command -v sha256sum &> /dev/null; then
-        verifier="sha256sum -c"
+        verifier=("sha256sum" "-c")
     elif command -v shasum &> /dev/null; then
-        verifier="shasum -a 256 -c"
+        verifier=("shasum" "-a" "256" "-c")
     else
         log_warning "No SHA256 verifier (sha256sum or shasum) available, skipping verification"
         return 0
@@ -253,7 +253,7 @@ verify_checksums() {
     
     cd "$BACKUP_DIR" || return 1
     
-    if $verifier "$checksums_file" &> /dev/null; then
+    if "${verifier[@]}" "$checksums_file" &> /dev/null; then
         log_success "All files verified successfully"
         echo "✓ Backup integrity verified"
         cd - > /dev/null
