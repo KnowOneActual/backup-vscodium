@@ -12,39 +12,24 @@
 # Simple backup to default location
 ./backup-codium.sh
 
-# Backup with verbose output to see what's happening
+# Create a compressed archive (portable)
+./backup-codium.sh --compress --timestamp
+
+# Backup with verbose output
 ./backup-codium.sh --verbose
-
-# Preview what would be backed up (dry-run)
-./backup-codium.sh --dry-run
-
-# Backup to custom location
-./backup-codium.sh --location ~/Dropbox/VSCodium
-
-# Backup with timestamp for versioning
-./backup-codium.sh --timestamp
-
-# Backup only settings (skip other stuff)
-./backup-codium.sh --only-settings
 ```
 
 ### Restore
 
 ```bash
-# Restore from default location (interactive)
+# Restore from default location
 ./restore-codium.sh
 
-# Restore from custom location
-./restore-codium.sh --backup ~/Dropbox/VSCodium
+# Restore directly from an archive
+./restore-codium.sh --backup path/to/backup.tar.gz
 
-# Preview restore without making changes
+# Preview restore (dry-run)
 ./restore-codium.sh --dry-run
-
-# Restore without confirmation prompts
-./restore-codium.sh --force
-
-# Restore only settings
-./restore-codium.sh --only-settings
 ```
 
 ---
@@ -54,6 +39,11 @@
 ### "I want to back up everything"
 ```bash
 ./backup-codium.sh --verbose
+```
+
+### "I want a portable backup file"
+```bash
+./backup-codium.sh --compress --timestamp
 ```
 
 ### "I want to back up to cloud storage"
@@ -118,32 +108,36 @@ chmod +x backup-codium.sh restore-codium.sh
 ### (Optional) Add to PATH
 
 ```bash
-# Copy to local bin
-cp backup-codium.sh ~/.local/bin/
-cp restore-codium.sh ~/.local/bin/
+# Use Makefile to install symlinks
+make install
 
 # Now you can use from anywhere
-backup-codium.sh --verbose
-restore-codium.sh --dry-run
+backup-codium --verbose
+restore-codium --dry-run
 ```
 
 ---
 
 ## 🧪 Testing
 
-### Run Unit Tests
+### Run All Checks
 ```bash
-bash tests/test-all.sh
+make check
 ```
 
-### Run Integration Tests (with mock configs)
+### Run Unit Tests
 ```bash
-bash tests/integration-tests.sh
+make test
+```
+
+### Run Integration Tests
+```bash
+make integration
 ```
 
 ### Check Code Quality
 ```bash
-shellcheck -x backup-codium.sh restore-codium.sh
+make lint
 ```
 
 ---

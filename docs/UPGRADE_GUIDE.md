@@ -1,10 +1,10 @@
-# Upgrade Guide: v1.0 → v2.0
+# Upgrade Guide: v1.0 → v2.x
 
-Welcome to backup-vscodium v2.0! This guide helps you understand what's changed and how to use the new features.
+Welcome to backup-vscodium v2.x! This guide helps you understand what's changed and how to use the latest features.
 
 ## ✅ Good News
 
-**Your existing backups are fully compatible!** You can restore v1.0 backups with v2.0 scripts without any modifications.
+**Your existing backups are fully compatible!** You can restore v1.0 backups with v2.x scripts without any modifications.
 
 ```bash
 # This still works
@@ -13,7 +13,45 @@ Welcome to backup-vscodium v2.0! This guide helps you understand what's changed 
 
 ## 🌟 What's New
 
-### Major Features
+### Major Features (v2.1+)
+
+#### 1. **Portable Backups (Compressed Archives)** 📦
+
+Create a single `.tar.gz` archive for easy transfer:
+
+```bash
+# Create compressed backup
+./backup-codium.sh --compress --timestamp
+
+# Result: VSCodium_Backup_20260307_120000.tar.gz
+```
+
+#### 2. **Smart Restore from Archives** 🧠
+
+Accept `.tar.gz` or `.zip` files directly:
+
+```bash
+# Restore from archive
+./restore-codium.sh --backup path/to/backup.tar.gz
+```
+
+#### 3. **Makefile Automation** 🛠️
+
+Automate development and installation tasks:
+
+```bash
+# Install to ~/.local/bin
+make install
+
+# Run all tests
+make test
+make integration
+
+# Lint scripts
+make lint
+```
+
+### Major Features (v2.0)
 
 #### 1. **Checksum Verification** ✓
 

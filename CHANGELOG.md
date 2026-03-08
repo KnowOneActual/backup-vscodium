@@ -16,11 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `make lint`: Run ShellCheck on scripts.
   * `make install`: Symlink scripts to `~/.local/bin`.
   * `make version`: Quick version check for all scripts.
+  * `make check`: Run both linting and unit tests.
+* **macOS Compatibility:** Improved support for macOS systems running older Bash versions (3.2):
+  * Lowered test suite Bash requirement to 3.2 after verifying compatibility.
+  * Added fallback to `shasum -a 256` if `sha256sum` is missing.
 * **Developer Experience:** Added `Makefile` documentation to `CONTRIBUTING.md`.
 
 ### Fixed
 
 * **Script Permissions:** Fixed `restore-codium.sh` which was missing execution permissions in the repository.
+* **Logging Robustness:** Fixed "No such file or directory" errors when writing to logs by ensuring backup directories are created before logging starts.
+* **Integration Tests:** Fixed mock directory paths and prompt handling to support macOS environments with spaces in paths.
+* **Checksum Verification:** Excluded all log files from checksum generation to prevent verification failures during the restore process.
 
 
 ## [2.1.0] - 2026-02-08

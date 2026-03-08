@@ -12,6 +12,9 @@ backup-vscodium/
 │  ├── backup-codium.sh           → Main backup script
 │  └── restore-codium.sh          → Main restore script
 ├─
+├── 🛠️ AUTOMATION
+│  └── Makefile                   → Task automation (test, lint, install)
+├─
 ├── 📄 DOCUMENTATION (Root Level - Critical Files)
 │  ├── README.md                  → Main user documentation (START HERE)
 │  ├── QUICK_REFERENCE.md         → Command cheat sheet
@@ -56,6 +59,15 @@ restore-codium.sh (v2.0.0)
 - Restores from backup with verification
 - Features: custom paths, selective restore, dry-run, force mode, checksums
 - Status: Production ready, zero warnings
+```
+
+### Automation (Root Level)
+
+```
+Makefile
+- Task automation for developers
+- Features: make test, make integration, make lint, make install, make version
+- Status: Production ready automation
 ```
 
 ### Documentation (Root Level)
@@ -311,7 +323,7 @@ tests/integration-tests.sh
 1. Fork and clone
 2. Read: CONTRIBUTING.md (Getting Started)
 3. Set up: Follow development environment setup
-4. Test: bash tests/test-all.sh
+4. Test: make check
 5. Code: Follow code style guidelines
 6. Submit: Create pull request
 ```

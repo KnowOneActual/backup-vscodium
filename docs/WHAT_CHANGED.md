@@ -1,20 +1,20 @@
-# What Changed in v2.0
+# What Changed in v2.x
 
 Quick visual reference of all improvements made to backup-vscodium.
 
 ## 📄 The Numbers
 
 ```
-v1.0                              v2.0
+v1.0                              v2.x
 ----                              ----
-50 lines (backup)     →  400+ lines
-60 lines (restore)    →  380+ lines
-2 functions           →  15+ functions
-3 error checks        →  20+ error checks
+50 lines (backup)     →  550+ lines
+60 lines (restore)    →  580+ lines
+2 functions           →  20+ functions
+3 error checks        →  30+ error checks
 0 options             →  27 options
-0 tests               →  20+ test cases
-100 lines docs        →  2,000+ lines docs
-0 logging             →  50+ log points
+0 tests               →  30+ test cases
+100 lines docs        →  2,500+ lines docs
+0 logging             →  60+ log points
 ```
 
 ## 🛶 Feature Roadmap
@@ -43,6 +43,13 @@ v2.0 Additions
 ├── Tests               ✓ NEW
 ├── CI/CD               ✓ NEW
 └── Documentation      ✓ EXPANDED
+
+v2.1+ Improvements
+├── Portable Backups    ✓ NEW (v2.1)
+├── Archive Restore     ✓ NEW (v2.1)
+├── Makefile Automation ✓ NEW
+├── macOS Compatibility ✓ IMPROVED
+└── Robust Logging      ✓ IMPROVED
 ```
 
 ## 🚠 Usage Comparison

@@ -2,7 +2,7 @@
 
 A professional-grade backup and restore solution for VSCodium configuration.
 
-**Current Status:** 🟢 Production Ready | ✅ All Tests Passing | 📦 Release v2.0.0
+**Current Status:** 🟢 Production Ready | ✅ All Tests Passing | 📦 v2.1.0+ (Latest)
 
 ---
 
@@ -18,9 +18,11 @@ Backup and restore all your VSCodium configuration:
 
 ### Key Features
 - ✅ **Complete backup** - Everything or selective components
+- ✅ **Portable** - Create compressed `.tar.gz` archives (`--compress`)
 - ✅ **Multiple locations** - Local, Dropbox, cloud storage
 - ✅ **Safety first** - Checksum verification, confirmation prompts, dry-run mode
-- ✅ **Cross-platform** - macOS and Linux support
+- ✅ **Cross-platform** - macOS (including legacy Bash 3.2) and Linux support
+- ✅ **Automation** - Full `Makefile` for developer workflow
 - ✅ **Professional** - Production-ready quality
 
 ---
@@ -128,10 +130,8 @@ git checkout -b feature/my-feature
 # 3. Make changes
 # ...
 
-# 4. Run tests
-bash tests/test-all.sh
-bash tests/integration-tests.sh
-shellcheck -x backup-codium.sh restore-codium.sh
+# 4. Run all checks via Makefile
+make check
 
 # 5. Submit PR
 ```

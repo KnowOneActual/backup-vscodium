@@ -41,9 +41,9 @@ A robust, feature-rich backup and restore solution for VSCodium configuration, s
 - Comprehensive logging
 
 ✅ **Professional Grade**
-- Bash 4.0+ compatible
-- ShellCheck clean
-- Comprehensive test coverage
+- **Bash 3.2+ Compatible:** Optimized for macOS (Darwin) and Linux.
+- **ShellCheck Clean:** Follows industry-standard linting rules.
+- **Comprehensive Testing:** Unit and integration tests for all core features.
 
 ---
 
@@ -56,16 +56,11 @@ A robust, feature-rich backup and restore solution for VSCodium configuration, s
 git clone https://github.com/KnowOneActual/backup-vscodium.git
 cd backup-vscodium
 
-# Make scripts executable (or use 'make install' below)
-chmod +x backup-codium.sh restore-codium.sh
-
-# (Optional) Add to your PATH via Makefile
+# Use the Makefile to install (symlinks to ~/.local/bin)
 make install
 
-# OR manually
-cp backup-codium.sh ~/.local/bin/
-cp restore-codium.sh ~/.local/bin/
-
+# OR make scripts executable manually
+chmod +x backup-codium.sh restore-codium.sh
 ```
 
 ### 📦 The "Portable" Workflow (Recommended)
@@ -218,9 +213,10 @@ Selective Restore:
 
 This project maintains high standards for reliability:
 
-* **Unit Tests:** Run `bash tests/test-all.sh` to verify script logic.
-* **Integration Tests:** Run `bash tests/integration-tests.sh` to simulate real backups/restores.
-* **Linting:** All scripts are **ShellCheck** clean.
+* **Automation:** Run `make check` to run all linters and tests.
+* **Unit Tests:** Run `make test` to verify script logic.
+* **Integration Tests:** Run `make integration` to simulate real backups/restores.
+* **Linting:** Run `make lint` to check for shell scripting best practices.
 
 For more details on running tests, see [TESTING.md](TESTING.md).
 

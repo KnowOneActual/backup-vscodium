@@ -1,6 +1,6 @@
 # 📚 backup-vscodium Documentation
 
-Welcome! Here's your guide to understanding and using backup-vscodium v2.0.
+Welcome! Here's your guide to understanding and using backup-vscodium v2.x.
 
 ---
 
@@ -10,7 +10,8 @@ Welcome! Here's your guide to understanding and using backup-vscodium v2.0.
 
 1. **[README.md](../README.md)** - Project overview, installation, and basic usage
 2. **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Common commands for everyday use
-3. **[Testing Guide](../TESTING.md)** - How to test locally and with CI/CD
+3. **[Automation (Makefile)](STRUCTURE.md#automation-root-level)** - How to use the automated workflow
+4. **[Testing Guide](../TESTING.md)** - How to test locally and with CI/CD
 
 ---
 
@@ -273,22 +274,22 @@ Welcome! Here's your guide to understanding and using backup-vscodium v2.0.
 ## 📊 Project Statistics
 
 ### Code
-- **Total Lines:** 780+ (backup + restore scripts)
-- **Functions:** 15+
+- **Total Lines:** 1,100+ (backup + restore scripts)
+- **Functions:** 20+
 - **CLI Options:** 27
-- **Test Coverage:** 20+ automated tests
+- **Test Coverage:** 30+ automated tests
 
 ### Documentation
-- **Total Lines:** 2,000+
-- **Guides:** 8 comprehensive documents
-- **Code Examples:** 50+
+- **Total Lines:** 2,500+
+- **Guides:** 9 comprehensive documents
+- **Code Examples:** 60+
 - **Visual Summaries:** Multiple
 
 ### Features
-- **v2.0 Additions:** 12 major features
+- **v2.x Additions:** 15+ major features
 - **Backward Compatibility:** 100%
 - **Breaking Changes:** 0
-- **Recommendations Implemented:** 12/14 (86%)
+- **macOS Support:** Optimized for Darwin/macOS (legacy & modern Bash)
 
 ---
 

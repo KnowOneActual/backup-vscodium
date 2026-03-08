@@ -71,11 +71,11 @@ Complete documentation for backup-vscodium organized by use case.
   - Quality metrics
   - Development timeline
 
-- **[../COMPLETION_REPORT.md](../COMPLETION_REPORT.md)** - Project improvements made
-  - Work completed in each phase
-  - Statistics and metrics
-  - Quality improvements
-  - Next steps
+- **[STRUCTURE.md](STRUCTURE.md)** - Project organization
+  - Directory layout
+  - File descriptions
+  - Role-based navigation
+  - Automation (Makefile)
 
 ---
 
@@ -86,11 +86,12 @@ Complete documentation for backup-vscodium organized by use case.
 | Goal | Start Here |
 |------|------------|
 | **Use the tool** | [../README.md](../README.md) |
-| **Find a command** | [../QUICK_REFERENCE.md](../QUICK_REFERENCE.md) |
+| **Find a command** | [QUICK_REFERENCE.md](QUICK_REFERENCE.md) |
 | **Contribute code** | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 | **Run tests** | [../TESTING.md](../TESTING.md) |
 | **Make a release** | [../RELEASE_PROCESS.md](../RELEASE_PROCESS.md) |
 | **Understand the project** | [../PROJECT_SUMMARY.md](../PROJECT_SUMMARY.md) |
+| **Project Structure** | [STRUCTURE.md](STRUCTURE.md) |
 | **See what changed** | [../CHANGELOG.md](../CHANGELOG.md) |
 
 ---
@@ -118,7 +119,7 @@ Maintainer-Facing
 
 Project Overview
 ├─ PROJECT_SUMMARY.md    ← Project overview
-└─ COMPLETION_REPORT.md  ← Improvements made
+└─ STRUCTURE.md          ← Project organization
 ```
 
 ---
