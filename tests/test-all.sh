@@ -290,8 +290,8 @@ print_test_summary() {
 # ============================================================================
 
 echo "[DEBUG] Bash version: ${BASH_VERSINFO[0]}"
-if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
-    echo "Error: This test suite requires Bash 4.0 or higher"
+if [ "${BASH_VERSINFO[0]:-0}" -lt 3 ]; then
+    echo "Error: This test suite requires Bash 3.2 or higher"
     exit 1
 fi
 

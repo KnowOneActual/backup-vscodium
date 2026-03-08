@@ -88,7 +88,7 @@ log() {
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
-    if [ -n "$LOG_FILE" ]; then
+    if [ -n "$LOG_FILE" ] && [ -d "$(dirname "$LOG_FILE")" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
     fi
     
@@ -138,21 +138,21 @@ log_warning() {
 detect_os() {
     OS_NAME=$(uname -s)
     
-    case "$OS_NAME" in
-        Darwin)
-            CONFIG_DIR="$HOME/Library/Application Support/VSCodium"
-            log "Detected macOS. Config path: $CONFIG_DIR"
-            ;;
-        Linux)
-            CONFIG_DIR="$HOME/.config/VSCodium"
-            log "Detected Linux. Config path: $CONFIG_DIR"
-            ;;
-        *)
-            log_error "Unsupported OS: $OS_NAME"
-            log_error "Currently supported: macOS, Linux"
-            exit 1
-            ;;
-    esac
+    if [ -z "${CONFIG_DIR:-}" ]; then
+        case "$OS_NAME" in
+            Darwin)
+                CONFIG_DIR="$HOME/Library/Application Support/VSCodium"
+                ;;
+            Linux)
+                CONFIG_DIR="$HOME/.config/VSCodium"
+                ;;
+            *)
+                echo "Error: Unsupported OS: $OS_NAME"
+                echo "Currently supported: macOS, Linux"
+                exit 1
+                ;;
+        esac
+    fi
 }
 
 validate_backup_location() {
@@ -178,13 +178,10 @@ validate_backup_location() {
     if [ ! -f "$BACKUP_DIR/extensions.txt" ] && [ ! -f "$BACKUP_DIR/User/settings.json" ]; then
         log_warning "Backup directory may be invalid - no typical backup files found"
     fi
-    
-    log "Backup location validated: $BACKUP_DIR"
 }
 
 extract_archive() {
     if [ "$DRY_RUN" = true ]; then
-        log "[DRY-RUN] Would extract archive: $BACKUP_DIR"
         return 0
     fi
     
@@ -242,8 +239,13 @@ verify_checksums() {
         return 0
     fi
     
-    if ! command -v sha256sum &> /dev/null; then
-        log_warning "sha256sum not available, skipping verification"
+    local verifier=""
+    if command -v sha256sum &> /dev/null; then
+        verifier="sha256sum -c"
+    elif command -v shasum &> /dev/null; then
+        verifier="shasum -a 256 -c"
+    else
+        log_warning "No SHA256 verifier (sha256sum or shasum) available, skipping verification"
         return 0
     fi
     
@@ -251,7 +253,7 @@ verify_checksums() {
     
     cd "$BACKUP_DIR" || return 1
     
-    if sha256sum -c "$checksums_file" &> /dev/null; then
+    if $verifier "$checksums_file" &> /dev/null; then
         log_success "All files verified successfully"
         echo "✓ Backup integrity verified"
         cd - > /dev/null
@@ -272,7 +274,8 @@ prompt_confirmation() {
         return 0
     fi
     
-    read -p "$message (yes/no): " -r response
+    echo -n "$message (yes/no): "
+    read -r response
     
     if [[ "$response" == "yes" ]] || [[ "$response" == "y" ]]; then
         return 0
@@ -512,14 +515,15 @@ main() {
     # Register cleanup trap
     trap cleanup EXIT
     
-    # Setup logging
-    # Note: If extracting from archive, this might be temporary
-    # We'll set it correctly after extraction logic potentially runs
-    
+    # Ensure backup directory exists for logging
+    if [ ! -d "$BACKUP_DIR" ] && [ "$DRY_RUN" = false ] && [[ "$BACKUP_DIR" != *.tar.gz ]] && [[ "$BACKUP_DIR" != *.tgz ]] && [[ "$BACKUP_DIR" != *.zip ]]; then
+        mkdir -p "$BACKUP_DIR"
+    fi
+
     # Detect OS and set paths
     detect_os
     check_codium_command || true
-    
+
     # Validate backup location (handles archives)
     validate_backup_location
     
@@ -531,6 +535,11 @@ main() {
     # Now that we have a final directory, set log file
     LOG_FILE="$BACKUP_DIR/restore.log"
     
+    # Ensure backup directory exists (it should, but safety first)
+    if [ ! -d "$BACKUP_DIR" ] && [ "$DRY_RUN" = false ]; then
+        mkdir -p "$BACKUP_DIR"
+    fi
+
     # Print startup info
     if [ "$DRY_RUN" = true ]; then
         echo "🔍 DRY RUN MODE - No files will be modified"

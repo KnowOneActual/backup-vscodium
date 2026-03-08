@@ -1,7 +1,7 @@
 # Makefile for backup-vscodium
 # Automates testing, linting, and installation
 
-.PHONY: help test integration lint install version
+.PHONY: help test integration lint install version check
 
 # Default target
 help:
@@ -13,7 +13,10 @@ help:
 	@echo "  make lint         - Run shellcheck on scripts (if available)"
 	@echo "  make install      - Symlink scripts to ~/.local/bin"
 	@echo "  make version      - Show script versions"
+	@echo "  make check        - Run lint and unit tests"
 	@echo "  make help         - Show this help message"
+
+check: lint test
 
 test:
 	@echo "Running unit tests..."

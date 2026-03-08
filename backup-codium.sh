@@ -90,7 +90,7 @@ log() {
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     
-    if [ -n "$LOG_FILE" ]; then
+    if [ -n "$LOG_FILE" ] && [ -d "$(dirname "$LOG_FILE")" ]; then
         echo "[$timestamp] $message" >> "$LOG_FILE"
     fi
     
@@ -140,33 +140,31 @@ log_warning() {
 detect_os() {
     OS_NAME=$(uname -s)
     
-    case "$OS_NAME" in
-        Darwin)
-            CONFIG_DIR="$HOME/Library/Application Support/VSCodium"
-            log "Detected macOS. Config path: $CONFIG_DIR"
-            ;;
-        Linux)
-            CONFIG_DIR="$HOME/.config/VSCodium"
-            log "Detected Linux. Config path: $CONFIG_DIR"
-            ;;
-        *)
-            log_error "Unsupported OS: $OS_NAME"
-            log_error "Currently supported: macOS, Linux"
-            exit 1
-            ;;
-    esac
+    if [ -z "${CONFIG_DIR:-}" ]; then
+        case "$OS_NAME" in
+            Darwin)
+                CONFIG_DIR="$HOME/Library/Application Support/VSCodium"
+                ;;
+            Linux)
+                CONFIG_DIR="$HOME/.config/VSCodium"
+                ;;
+            *)
+                echo "Error: Unsupported OS: $OS_NAME"
+                echo "Currently supported: macOS, Linux"
+                exit 1
+                ;;
+        esac
+    fi
     
     if [ ! -d "$CONFIG_DIR" ]; then
-        log_error "VSCodium config directory not found at: $CONFIG_DIR"
-        log_error "Is VSCodium installed correctly?"
+        echo "Error: VSCodium config directory not found at: $CONFIG_DIR"
+        echo "Is VSCodium installed correctly?"
         exit 1
     fi
 }
 
 check_codium_command() {
     if ! command -v codium &> /dev/null; then
-        log_warning "'codium' command not found in PATH"
-        log_warning "Extension backup will be skipped"
         BACKUP_EXTENSIONS=false
         return 1
     fi
@@ -187,8 +185,6 @@ validate_backup_location() {
         log_error "No write permission for: $parent_dir"
         exit 1
     fi
-    
-    log "Backup location validated: $BACKUP_DIR"
 }
 
 # ============================================================================
@@ -375,15 +371,21 @@ create_checksums() {
         return 0
     fi
     
-    if ! command -v sha256sum &> /dev/null; then
-        log_warning "sha256sum not available, skipping checksum generation"
+    local hasher=""
+    if command -v sha256sum &> /dev/null; then
+        hasher="sha256sum"
+    elif command -v shasum &> /dev/null; then
+        hasher="shasum -a 256"
+    else
+        log_warning "No SHA256 hasher (sha256sum or shasum) available, skipping checksum generation"
         return 1
     fi
     
     cd "$BACKUP_DIR" || return 1
-    find . -type f ! -name "backup.sha256" ! -name "manifest.txt" -print0 | \
-        xargs -0 sha256sum > "$checksums_file" 2>/dev/null || {
+    find . -type f ! -name "backup.sha256" ! -name "manifest.txt" ! -name "*.log" -print0 | \
+        xargs -0 $hasher > "$checksums_file" 2>/dev/null || {
         log_error "Failed to create checksums"
+        cd - > /dev/null
         return 1
     }
     
@@ -498,6 +500,11 @@ main() {
         BACKUP_DIR="${BACKUP_DIR}_$(date +%Y%m%d_%H%M%S)"
     fi
     
+    # Ensure backup directory exists for logging
+    if [ "$DRY_RUN" = false ]; then
+        mkdir -p "$BACKUP_DIR"
+    fi
+
     # Setup logging
     LOG_FILE="$BACKUP_DIR/backup.log"
     

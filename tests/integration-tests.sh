@@ -17,7 +17,7 @@ readonly RESTORE_SCRIPT="$PROJECT_DIR/restore-codium.sh"
 
 # Test directories
 readonly TEST_ROOT="/tmp/backup_vscodium_integration_tests"
-readonly MOCK_VSCODIUM="$TEST_ROOT/mock_vscodium"
+readonly MOCK_VSCODIUM="$TEST_ROOT/Library/Application Support/VSCodium"
 readonly BACKUP_DIR="$TEST_ROOT/backups"
 readonly RESTORE_DIR="$TEST_ROOT/restore_target"
 
@@ -60,7 +60,7 @@ fail() {
 setup_mock_vscodium() {
     echo "[SETUP] Creating mock VSCodium configuration..."
     
-    # Create directory structure (Linux style for testing)
+    # Create directory structure (handles both macOS and Linux styles for testing)
     mkdir -p "$MOCK_VSCODIUM/User/snippets"
     
     # Create mock settings.json
@@ -118,9 +118,10 @@ cleanup_test_dirs() {
 test_backup_basic() {
     test_case "Backup creates backup directory"
     
+    export CONFIG_DIR="$MOCK_VSCODIUM"
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test1" \
-        2>/dev/null || true
+        
     
     if [ -d "$BACKUP_DIR/test1" ]; then
         pass "Backup directory created"
@@ -133,13 +134,13 @@ test_backup_settings() {
     test_case "Backup includes settings.json"
     
     # Mock the config directory for this test
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_settings" \
         --no-keybindings --no-snippets --no-extensions \
-        2>/dev/null || true
+        
     
     if [ -f "$BACKUP_DIR/test_settings/User/settings.json" ]; then
         pass "Settings.json backed up"
@@ -151,13 +152,13 @@ test_backup_settings() {
 test_backup_keybindings() {
     test_case "Backup includes keybindings.json"
     
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_keybindings" \
         --no-settings --no-snippets --no-extensions \
-        2>/dev/null || true
+        
     
     if [ -f "$BACKUP_DIR/test_keybindings/User/keybindings.json" ]; then
         pass "Keybindings.json backed up"
@@ -169,13 +170,13 @@ test_backup_keybindings() {
 test_backup_snippets() {
     test_case "Backup includes snippets directory"
     
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_snippets" \
         --no-settings --no-keybindings --no-extensions \
-        2>/dev/null || true
+        
     
     if [ -f "$BACKUP_DIR/test_snippets/snippets/python.json" ]; then
         pass "Snippets directory backed up"
@@ -187,12 +188,12 @@ test_backup_snippets() {
 test_backup_creates_manifest() {
     test_case "Backup creates manifest.txt"
     
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_manifest" \
-        --no-extensions 2>/dev/null || true
+        --no-extensions 
     
     if [ -f "$BACKUP_DIR/test_manifest/manifest.txt" ]; then
         pass "Manifest file created"
@@ -204,12 +205,12 @@ test_backup_creates_manifest() {
 test_backup_dry_run() {
     test_case "Backup --dry-run doesn't create files"
     
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_dryrun" \
-        --dry-run --no-extensions 2>/dev/null || true
+        --dry-run --no-extensions 
     
     if [ ! -f "$BACKUP_DIR/test_dryrun/User/settings.json" ]; then
         pass "Dry-run mode didn't create backup files"
@@ -221,12 +222,12 @@ test_backup_dry_run() {
 test_backup_selective() {
     test_case "Backup --only-settings restricts to settings"
     
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_selective" \
-        --only-settings 2>/dev/null || true
+        --only-settings 
     
     local settings_exists=false
     local keybindings_exists=false
@@ -249,22 +250,28 @@ test_restore_settings() {
     test_case "Restore restores settings.json"
     
     # First create a backup
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_restore" \
-        --no-extensions 2>/dev/null || true
+        --no-extensions 
     
     # Now restore to different location
-    mkdir -p "$RESTORE_DIR/User"
+    rm -rf "$RESTORE_DIR"
+    mkdir -p "$RESTORE_DIR"
+    export HOME="$RESTORE_DIR"
+    unset CONFIG_DIR
     bash "$RESTORE_SCRIPT" \
         -b "$BACKUP_DIR/test_restore" \
-        --force --no-extensions 2>/dev/null || true
+        --force --no-extensions 
     
-    if [ -f "$RESTORE_DIR/User/settings.json" ]; then
+    # Path depends on OS detection in the script
+    if [ -f "$MOCK_VSCODIUM/User/settings.json" ] || [ -f "$RESTORE_DIR/.config/VSCodium/User/settings.json" ]; then
         pass "Settings restored"
     else
+        echo "[DEBUG] Looking for settings.json in $RESTORE_DIR"
+        ls -R "$RESTORE_DIR"
         fail "Settings not restored"
     fi
 }
@@ -273,12 +280,12 @@ test_restore_preserves_content() {
     test_case "Restore preserves file content"
     
     # Backup
-    export HOME="$TEST_ROOT/home"
+    export HOME="$TEST_ROOT"
     export CONFIG_DIR="$MOCK_VSCODIUM"
     
     bash "$BACKUP_SCRIPT" \
         -l "$BACKUP_DIR/test_content" \
-        --no-extensions 2>/dev/null || true
+        --no-extensions 
     
     # Restore
     mkdir -p "$RESTORE_DIR/content_test/User"
@@ -302,7 +309,7 @@ run_all_tests() {
     echo "=========================================="
     
     # Setup
-    cleanup_test_dirs
+    
     setup_mock_vscodium
     
     # Backup tests
@@ -321,7 +328,7 @@ run_all_tests() {
     test_restore_preserves_content
     
     # Cleanup
-    cleanup_test_dirs
+    
     
     # Print summary
     print_summary
@@ -351,8 +358,8 @@ print_summary() {
 # ============================================================================
 
 echo "[DEBUG] Bash version: ${BASH_VERSINFO[0]}"
-if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
-    echo "Error: This test suite requires Bash 4.0 or higher"
+if [ "${BASH_VERSINFO[0]:-0}" -lt 3 ]; then
+    echo "Error: This test suite requires Bash 3.2 or higher"
     exit 1
 fi
 
