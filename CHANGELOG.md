@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Added
+
+* **Makefile Automation:** Added a `Makefile` to automate common development tasks:
+  * `make test`: Run unit tests.
+  * `make integration`: Run integration tests.
+  * `make lint`: Run ShellCheck on scripts.
+  * `make install`: Symlink scripts to `~/.local/bin`.
+  * `make version`: Quick version check for all scripts.
+* **Developer Experience:** Added `Makefile` documentation to `CONTRIBUTING.md`.
+
+### Fixed
+
+* **Script Permissions:** Fixed `restore-codium.sh` which was missing execution permissions in the repository.
+
+
 ## [2.1.0] - 2026-02-08
 
 ### Added

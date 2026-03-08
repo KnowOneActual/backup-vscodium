@@ -32,6 +32,27 @@ git checkout -b feature/my-feature
 sudo apt-get install shellcheck
 # macOS
 brew install shellcheck
+
+### Automation (Makefile)
+
+The project includes a `Makefile` to automate common development tasks:
+
+```bash
+# Run all unit tests
+make test
+
+# Run all integration tests
+make integration
+
+# Lint scripts with ShellCheck
+make lint
+
+# Install scripts to ~/.local/bin (as symlinks)
+make install
+
+# Show help for all commands
+make help
+```
 ```
 
 ---

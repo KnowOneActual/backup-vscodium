@@ -53,13 +53,16 @@ A robust, feature-rich backup and restore solution for VSCodium configuration, s
 
 ```bash
 # Clone the repository
-git clone [https://github.com/KnowOneActual/backup-vscodium.git](https://github.com/KnowOneActual/backup-vscodium.git)
+git clone https://github.com/KnowOneActual/backup-vscodium.git
 cd backup-vscodium
 
-# Make scripts executable
+# Make scripts executable (or use 'make install' below)
 chmod +x backup-codium.sh restore-codium.sh
 
-# (Optional) Add to your PATH
+# (Optional) Add to your PATH via Makefile
+make install
+
+# OR manually
 cp backup-codium.sh ~/.local/bin/
 cp restore-codium.sh ~/.local/bin/
 
